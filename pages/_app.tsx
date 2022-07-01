@@ -5,9 +5,14 @@ import type { AppProps } from 'next/app';
 import { withTRPC } from '@trpc/next';
 import { AppRouter } from 'server/router';
 import superjson from 'superjson';
+import { AppLayout } from 'components/layouts/app-layout';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return (
+    <AppLayout>
+      <Component {...pageProps} />
+    </AppLayout>
+  );
 }
 
 function getBaseUrl() {

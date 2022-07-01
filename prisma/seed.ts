@@ -1,33 +1,19 @@
 import { PrismaClient } from '@prisma/client';
-import { users, posts, comments } from './seeds';
+import { users, posts, comments, postUpvotes } from './seeds';
 
 const prisma = new PrismaClient();
 
 const load = async () => {
   try {
-    await prisma.post.deleteMany();
-    console.log('Deleted records in post table');
+    await comments.cleanup(prisma);
+    await postUpvotes.cleanup(prisma);
+    await posts.cleanup(prisma);
+    await users.cleanup(prisma);
 
-    await prisma.comment.deleteMany();
-    console.log('Deleted records in comment table');
-
-    await prisma.user.deleteMany();
-    console.log('Deleted records in user table');
-
-    await prisma.user.createMany({
-      data: users,
-    });
-    console.log('Added users data');
-
-    await prisma.post.createMany({
-      data: posts,
-    });
-    console.log('Added posts data');
-
-    await prisma.comment.createMany({
-      data: comments,
-    });
-    console.log('Added comments data');
+    await users.seed(prisma);
+    await posts.seed(prisma);
+    await postUpvotes.seed(prisma);
+    await comments.seed(prisma);
   } catch (e) {
     console.error(e);
     process.exit(1);

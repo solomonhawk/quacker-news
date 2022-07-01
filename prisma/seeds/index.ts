@@ -1,3 +1,4 @@
-export * from './users';
-export * from './comments';
-export * from './posts';
+export * as users from './users';
+export * as comments from './comments';
+export * as posts from './posts';
+export * as postUpvotes from './post-upvotes';

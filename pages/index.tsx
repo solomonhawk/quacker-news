@@ -39,7 +39,8 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
 
   const ssg = await createSSGHelpers({
     router: appRouter,
-    ctx: { prisma, user: undefined },
+    // @TODO(shawk): get user id from session
+    ctx: { prisma, user: { id: '30d88f08-8786-4023-9428-350c4e2a0848' } },
     transformer: superjson,
   });
 

@@ -7,6 +7,7 @@ import superjson from 'superjson';
 import { createSSGHelpers } from '@trpc/react/ssg';
 import { TRPCError } from '@trpc/server';
 import { prisma } from 'lib/prisma';
+import { getSession } from 'next-auth/react';
 
 const ItemPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
   const postQuery = trpc.useQuery(['post.byId', { id }]);
@@ -34,14 +35,16 @@ const ItemPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
   );
 };
 
-export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx => {
+export const getServerSideProps: GetServerSideProps<{
+  id: string;
+}> = async ctx => {
   const id = ctx.query.id as string;
+  const session = await getSession({ ctx });
 
   try {
     const ssg = await createSSGHelpers({
       router: appRouter,
-      // @TODO(shawk): get user id from session
-      ctx: { prisma, user: { id: '30d88f08-8786-4023-9428-350c4e2a0848' } },
+      ctx: { prisma, user: session?.user },
       transformer: superjson,
     });
 

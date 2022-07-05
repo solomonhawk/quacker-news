@@ -4,18 +4,21 @@ export const seed = async (prisma: PrismaClient) => {
   const users: Prisma.UserCreateManyInput[] = [
     {
       email: 'solomon.hawk@viget.com',
-      username: 'solomon.hawk',
-      passwordHash: 'whatever',
+      username: 'shawk',
+      // "password"
+      passwordHash: '$2a$10$MNQdW.ubu1IAb4bihXgVY.19a3piz//Yym98UjZ56XbUZO7Thug9y',
     },
     {
       email: 'solomon.hawk2@viget.com',
       username: 'solomon.hawk2',
-      passwordHash: 'whatever',
+      // "password"
+      passwordHash: '$2a$10$MNQdW.ubu1IAb4bihXgVY.19a3piz//Yym98UjZ56XbUZO7Thug9y',
     },
     {
       email: 'solomon.hawk3@viget.com',
-      username: 'solomon.hawk3',
-      passwordHash: 'whatever',
+      username: 'solomonster',
+      // "password"
+      passwordHash: '$2a$10$MNQdW.ubu1IAb4bihXgVY.19a3piz//Yym98UjZ56XbUZO7Thug9y',
     },
   ];
 

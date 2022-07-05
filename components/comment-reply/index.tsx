@@ -17,7 +17,7 @@ export const CommentReply = ({ comment }: Props) => {
           <CommentUpvoteButton
             postId={comment.postId}
             commentId={comment.id}
-            disabled={comment.authorId === '30d88f08-8786-4023-9428-350c4e2a0848'}
+            disabled={comment.authorId === 'a78b4628-c4cd-414f-8031-6d62a300ead3'}
             upvoted={comment.upvotes.length > 0}
             visible
           />

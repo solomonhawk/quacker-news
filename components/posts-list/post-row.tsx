@@ -7,7 +7,7 @@ import { Timestamp } from './timestamp';
 export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.all'>['posts']> }) => {
   return (
     <>
-      <span className="opacity-60">{post.position}.</span>
+      <span className="opacity-60 font-mono">{post.position}.</span>
 
       <PostUpvoteButton postId={post.id} disabled={false} upvoted={post.upvotes.length > 0} />
 
@@ -34,7 +34,8 @@ export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.al
           <Timestamp date={post.createdAt} /> | <button className="hover:underline">hide</button> |{' '}
           <Link href={`/item?id=${post.id}`}>
             <a className="hover:underline">
-              {post._count.comments} comment{post._count.comments === 1 ? '' : 's'}
+              {post._count.comments} comment
+              {post._count.comments === 1 ? '' : 's'}
             </a>
           </Link>
         </div>

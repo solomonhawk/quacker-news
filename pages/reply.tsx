@@ -9,6 +9,7 @@ import { prisma } from 'lib/prisma';
 import { CommentReply } from 'components/comment-reply';
 import { ReplyLayout } from 'components/layouts/reply-layout';
 import { NextPageWithLayout } from './_app';
+import { getSession } from 'next-auth/react';
 
 const ReplyPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
   const commentQuery = trpc.useQuery(['comment.byId', { id }]);
@@ -38,12 +39,12 @@ const ReplyPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServer
 
 export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx => {
   const id = ctx.query.id as string;
+  const session = await getSession({ ctx });
 
   try {
     const ssg = await createSSGHelpers({
       router: appRouter,
-      // @TODO(shawk): get user id from session
-      ctx: { prisma, user: undefined },
+      ctx: { prisma, user: session?.user },
       transformer: superjson,
     });
 

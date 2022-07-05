@@ -7,7 +7,11 @@ const DIVISIONS = [
   { amount: 7, name: 'days', intervalMs: 60 * 60 * 1000 },
   { amount: 4.34524, name: 'weeks', intervalMs: Number.POSITIVE_INFINITY },
   { amount: 12, name: 'months', intervalMs: Number.POSITIVE_INFINITY },
-  { amount: Number.POSITIVE_INFINITY, name: 'years', intervalMs: Number.POSITIVE_INFINITY },
+  {
+    amount: Number.POSITIVE_INFINITY,
+    name: 'years',
+    intervalMs: Number.POSITIVE_INFINITY,
+  },
 ] as const;
 
 export const formatTimeAgo = (date: Date): { text: string; intervalMs: number } => {
@@ -17,7 +21,10 @@ export const formatTimeAgo = (date: Date): { text: string; intervalMs: number } 
     const division = DIVISIONS[i];
 
     if (Math.abs(duration) < division.amount) {
-      return { text: fmt.format(Math.round(duration), division.name), intervalMs: division.intervalMs };
+      return {
+        text: fmt.format(Math.round(duration), division.name),
+        intervalMs: division.intervalMs,
+      };
     }
 
     duration /= division.amount;

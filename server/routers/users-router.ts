@@ -1,13 +1,9 @@
-import { Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
-import { createRouter } from 'server/create-router';
+import bcrypt from 'bcryptjs';
+import * as users from 'server/domains/users';
+import { createProtectedRouter, createRouter } from 'server/create-router';
+import { defaultUserSelect } from 'server/domains/users';
 import { z } from 'zod';
-
-const defaultUserSelect = Prisma.validator<Prisma.UserSelect>()({
-  id: true,
-  email: true,
-  username: true,
-});
 
 export const usersRouter = createRouter()
   /**
@@ -32,4 +28,36 @@ export const usersRouter = createRouter()
 
       return user;
     },
-  });
+  })
+
+  /**
+   * @description Create a new user
+   */
+  .mutation('create', {
+    input: z.object({
+      email: z.string(),
+      username: z.string(),
+      password: z.string(),
+    }),
+    async resolve({ input: { email, username, password }, ctx }) {
+      return await ctx.prisma.user.create({
+        data: {
+          email,
+          username,
+          passwordHash: await bcrypt.hash(password, 10),
+        },
+        select: defaultUserSelect,
+      });
+    },
+  })
+
+  /**
+   * @description Get the current user's karma count
+   */
+  .merge(
+    createProtectedRouter().query('karma', {
+      async resolve({ ctx }) {
+        return await users.karma(ctx);
+      },
+    }),
+  );

@@ -31,4 +31,6 @@ const TimestampImpl = ({ date }: { date: Date }) => {
 
 // Avoid hydration mismatch between SSR and client render
 // ref: https://github.com/vercel/next.js/discussions/35773
-export const Timestamp = dynamic(() => Promise.resolve(TimestampImpl), { ssr: false });
+export const Timestamp = dynamic(() => Promise.resolve(TimestampImpl), {
+  ssr: false,
+});

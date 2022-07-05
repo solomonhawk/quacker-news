@@ -1,8 +1,12 @@
+import { trpc } from 'lib/trpc';
+import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 const links = [
+  { text: 'welcome', href: '/welcome', requireAuth: true },
   { text: 'new', href: '/newest' },
+  { text: 'threads', href: '/threads', requireAuth: true },
   { text: 'past', href: '/front' },
   { text: 'comments', href: '/newcomments' },
   { text: 'ask', href: '/ask' },
@@ -12,10 +16,18 @@ const links = [
 ];
 
 export const AppHeader = () => {
+  const { data: session, status } = useSession();
+
+  const karmaQuery = trpc.useQuery(['user.karma'], {
+    enabled: status === 'authenticated',
+    staleTime: 5 * 1000, // 5 seconds
+    refetchOnWindowFocus: true,
+  });
+
   return (
     <header className="bg-orange-500 p-[2px] flex items-center">
       <Link href="/">
-        <a className="border border-solid border-white w-[20px] h-[20px] mr-1">
+        <a className="border border-solid border-white w-[20px] h-[20px] mr-1 flex-shrink-0">
           <Image src="/y18.gif" alt="" width="18" height="18" />
         </a>
       </Link>
@@ -27,20 +39,46 @@ export const AppHeader = () => {
           </a>
         </Link>
 
-        <nav className="sm:ml-2 divide-x divide-black">
-          {links.map(link => {
-            return (
-              <Link key={link.href} href={link.href}>
-                <a className="px-1">{link.text}</a>
-              </Link>
-            );
-          })}
+        <nav className="sm:ml-2 divide-x divide-black flex flex-wrap py-1">
+          {links
+            .filter(link => (status !== 'authenticated' ? !link.requireAuth : true))
+            .map(link => {
+              return (
+                <Link key={link.href} href={link.href}>
+                  <a className="px-1 leading-none">{link.text}</a>
+                </Link>
+              );
+            })}
         </nav>
       </div>
 
-      <Link href="/login">
-        <a className="px-1 ml-auto">login</a>
-      </Link>
+      {status === 'unauthenticated' && (
+        <Link href="/login">
+          <a className="px-1 ml-auto">login</a>
+        </Link>
+      )}
+
+      {status === 'authenticated' && (
+        <div className="ml-auto">
+          <Link href={`/user?id=${session.user?.id}`}>
+            <a className="px-1 ml-auto">{session.user?.username}</a>
+          </Link>
+
+          <span>({karmaQuery.data ?? session.user.karma})</span>
+
+          <Link href="/api/auth/signout">
+            <a
+              className="px-1"
+              onClick={e => {
+                e.preventDefault();
+                signOut();
+              }}
+            >
+              sign out
+            </a>
+          </Link>
+        </div>
+      )}
     </header>
   );
 };

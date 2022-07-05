@@ -3,6 +3,7 @@ import { PostsList } from 'components/posts-list';
 import { prisma } from 'lib/prisma';
 import { trpc } from 'lib/trpc';
 import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
+import { getSession } from 'next-auth/react';
 import Head from 'next/head';
 import { appRouter } from 'server/router';
 import superjson from 'superjson';
@@ -34,13 +35,14 @@ const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>
 };
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
+  const session = await getSession({ ctx });
   const pageParam = parseInt(ctx.query.page as string, 10);
   const page = isNaN(pageParam) ? 1 : pageParam;
 
   const ssg = await createSSGHelpers({
     router: appRouter,
     // @TODO(shawk): get user id from session
-    ctx: { prisma, user: { id: '30d88f08-8786-4023-9428-350c4e2a0848' } },
+    ctx: { prisma, user: session?.user },
     transformer: superjson,
   });
 

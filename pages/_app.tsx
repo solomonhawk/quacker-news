@@ -1,9 +1,10 @@
+import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { withTRPC } from '@trpc/next';
 import { AppLayout } from 'components/layouts/app-layout';
 import { NextPage } from 'next';
-import type { AppProps, NextWebVitalsMetric } from 'next/app';
+import { SessionProvider } from 'next-auth/react';
 import Router from 'next/router';
 import nProgress from 'nprogress';
 import { AppRouter } from 'server/router';
@@ -29,16 +30,16 @@ type AppPropsWithLayout = AppProps & {
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || (page => <AppLayout>{page}</AppLayout>);
 
-  return getLayout(<Component {...pageProps} />);
+  return <SessionProvider session={pageProps.session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>;
 }
 
-function getBaseUrl() {
+function getApiUrl() {
   if (typeof window !== 'undefined') {
-    return '';
+    return '/api/trpc';
   }
 
   // assume localhost
-  return `http://localhost:${process.env.PORT ?? 3000}`;
+  return `http://localhost:${process.env.PORT ?? 3000}/api/trpc`;
 }
 
 export default withTRPC<AppRouter>({
@@ -51,7 +52,7 @@ export default withTRPC<AppRouter>({
             process.env.NODE_ENV === 'development' || (opts.direction === 'down' && opts.result instanceof Error),
         }),
         httpBatchLink({
-          url: `${getBaseUrl()}/api/trpc`,
+          url: getApiUrl(),
         }),
       ],
       transformer: superjson,

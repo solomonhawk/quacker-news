@@ -1,4 +1,3 @@
-import { Post } from 'components/post';
 import { trpc } from 'lib/trpc';
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
 import Head from 'next/head';
@@ -7,19 +6,21 @@ import superjson from 'superjson';
 import { createSSGHelpers } from '@trpc/react/ssg';
 import { TRPCError } from '@trpc/server';
 import { prisma } from 'lib/prisma';
+import { CommentReply } from 'components/comment-reply';
+import { Comment } from 'components/post/comment';
 
-const ItemPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
-  const postQuery = trpc.useQuery(['post.byId', { id }]);
+const CommentPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
+  const commentQuery = trpc.useQuery(['comment.byId', { id }]);
 
-  if (postQuery.isLoading && !postQuery.data) {
+  if (commentQuery.isLoading && !commentQuery.data) {
     return <div>Loading...</div>;
   }
 
-  if (postQuery.isError || !postQuery.data) {
+  if (commentQuery.isError || !commentQuery.data) {
     return <div>Something went wrong...</div>;
   }
 
-  const pageTitle = `QuackerNews - ${postQuery.data.title}`;
+  const pageTitle = `QuackerNews - Comment on ${commentQuery.data.post.title}`;
 
   return (
     <>
@@ -29,7 +30,11 @@ const ItemPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Post post={postQuery.data} />
+      <CommentReply comment={commentQuery.data} />
+
+      {commentQuery.data.comments.map(comment => {
+        return <Comment key={comment.id} comment={comment} />;
+      })}
     </>
   );
 };
@@ -45,7 +50,7 @@ export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx 
       transformer: superjson,
     });
 
-    await ssg.fetchQuery('post.byId', { id });
+    await ssg.fetchQuery('comment.byId', { id });
 
     return { props: { trpcState: ssg.dehydrate(), id } };
   } catch (error) {
@@ -61,4 +66,4 @@ export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx 
   }
 };
 
-export default ItemPage;
+export default CommentPage;

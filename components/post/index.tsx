@@ -1,8 +1,9 @@
 import { PostUpvoteButton } from 'components/post-upvote-button';
-import PostTimestamp from 'components/posts-list/post-timestamp';
+import { Timestamp } from 'components/posts-list/timestamp';
 import { InferQueryOutput } from 'helpers/trpc';
 import { host } from 'helpers/url';
 import Link from 'next/link';
+import { AddCommentForm } from './add-comment-form';
 import { Comment } from './comment';
 
 type PostQueryById = InferQueryOutput<'post.byId'>;
@@ -37,7 +38,7 @@ export const Post = ({ post }: { post: PostQueryById }) => {
             <Link href={`/user?id=${post.author.id}`}>
               <a className="hover:underline">{post.author.username}</a>
             </Link>{' '}
-            <PostTimestamp date={post.createdAt} /> | <button className="hover:underline">hide</button> |{' '}
+            <Timestamp date={post.createdAt} /> | <button className="hover:underline">hide</button> |{' '}
             <Link href={`/item?id=${post.id}`}>
               <a className="hover:underline">
                 {post._count.comments} comment{post._count.comments === 1 ? '' : 's'}
@@ -48,15 +49,7 @@ export const Post = ({ post }: { post: PostQueryById }) => {
       </div>
 
       <div className="mb-8 ml-7">
-        <form>
-          <textarea className="block w-[90%] border border-gray-700 rounded text-lg p-2 mb-2" rows={8} cols={80} />
-          <button
-            type="submit"
-            className="bg-gray-100 hover:bg-gray-200 active:bg-gray-100 rounded border border-gray-700 px-2 font-mono"
-          >
-            add comment
-          </button>
-        </form>
+        <AddCommentForm postId={post.id} submitButtonText="add comment" />
       </div>
 
       {post.comments.map(comment => {

@@ -1,6 +1,9 @@
 import { Prisma } from '@prisma/client';
-import { createProtectedRouter } from 'server/create-router';
-import { z } from 'zod';
+import { TRPCError } from '@trpc/server';
+import * as comments from '../domains/comments';
+import { createRouter, createProtectedRouter } from 'server/create-router';
+import { commentValidator } from 'server/domains/comments/helpers';
+import * as z from 'zod';
 
 const defaultCommentSelect = Prisma.validator<Prisma.CommentSelect>()({
   id: true,
@@ -8,19 +11,38 @@ const defaultCommentSelect = Prisma.validator<Prisma.CommentSelect>()({
   createdAt: true,
 });
 
-export const commentsRouter = createProtectedRouter()
+export const commentsRouter = createRouter()
   /**
-   * @description Create comment
+   * @description Get comment by ID
    */
-  .mutation('create', {
+  .query('byId', {
     input: z.object({
-      postId: z.string(),
-      content: z.string(),
+      id: z.string(),
     }),
-    async resolve({ input, ctx }) {
-      return ctx.prisma.comment.create({
-        data: { ...input, authorId: ctx.user.id },
-        select: defaultCommentSelect,
-      });
+    async resolve({ input: { id }, ctx }) {
+      try {
+        return await comments.byId(ctx, id);
+      } catch (error) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Comment not found',
+          cause: error,
+        });
+      }
     },
-  });
+  })
+  .merge(
+    createProtectedRouter()
+      /**
+       * @description Create comment
+       */
+      .mutation('create', {
+        input: commentValidator,
+        async resolve({ input, ctx }) {
+          return ctx.prisma.comment.create({
+            data: { ...input, authorId: ctx.user.id },
+            select: defaultCommentSelect,
+          });
+        },
+      }),
+  );

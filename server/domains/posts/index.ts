@@ -1,28 +1,20 @@
-import { Prisma } from '@prisma/client';
-import { prisma } from 'lib/prisma';
-import { threadComments } from './helpers';
+import { Context } from 'server/context';
+import { commentWithAuthorAndUserUpvote } from '../comments';
+import { threadComments } from '../comments/helpers';
 
-const commentWithAuthorAndUserUpvote = (userId?: string) => {
-  return Prisma.validator<Prisma.CommentArgs>()({
-    include: { upvotes: { where: { userId } }, author: { select: { username: true } } },
-  });
-};
-
-export type PostComment = Prisma.CommentGetPayload<ReturnType<typeof commentWithAuthorAndUserUpvote>>;
-
-export async function all(page: number, perPage: number, userId?: string) {
+export async function all(ctx: Context, page: number, perPage: number) {
   const skip = (page - 1) * perPage;
 
-  const [totalCount, posts] = await prisma.$transaction([
-    prisma.post.count(),
-    prisma.post.findMany({
+  const [totalCount, posts] = await ctx.prisma.$transaction([
+    ctx.prisma.post.count(),
+    ctx.prisma.post.findMany({
       skip,
       take: perPage,
       include: {
         _count: true,
         upvotes: {
           where: {
-            userId,
+            userId: ctx.user?.id,
           },
         },
         author: {
@@ -49,15 +41,15 @@ export async function all(page: number, perPage: number, userId?: string) {
   };
 }
 
-export async function byId(id: string, userId?: string) {
-  const post = await prisma.post.findUnique({
+export async function byId(ctx: Context, id: string) {
+  const post = await ctx.prisma.post.findUnique({
     rejectOnNotFound: true,
     where: { id },
     include: {
       _count: true,
       upvotes: {
         where: {
-          userId,
+          userId: ctx.user?.id,
         },
       },
       author: {
@@ -66,7 +58,7 @@ export async function byId(id: string, userId?: string) {
           username: true,
         },
       },
-      comments: commentWithAuthorAndUserUpvote(userId),
+      comments: commentWithAuthorAndUserUpvote(ctx.user?.id),
     },
   });
 

@@ -12,7 +12,7 @@ export const postsRouter = createRouter()
     input: paginationValidator,
     async resolve({ input: { page, perPage }, ctx }) {
       try {
-        return await posts.all(page, perPage, ctx.user?.id);
+        return await posts.all(ctx, page, perPage);
       } catch (error) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
@@ -32,7 +32,7 @@ export const postsRouter = createRouter()
     }),
     async resolve({ input: { id }, ctx }) {
       try {
-        return await posts.byId(id, ctx.user?.id);
+        return await posts.byId(ctx, id);
       } catch (error) {
         throw new TRPCError({
           code: 'NOT_FOUND',

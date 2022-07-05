@@ -2,7 +2,7 @@ import { PostUpvoteButton } from 'components/post-upvote-button';
 import { ArrayElement, InferQueryOutput } from 'helpers/trpc';
 import { host } from 'helpers/url';
 import Link from 'next/link';
-import PostTimestamp from './post-timestamp';
+import { Timestamp } from './timestamp';
 
 export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.all'>['posts']> }) => {
   return (
@@ -13,7 +13,7 @@ export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.al
 
       <div className="flex flex-col ml-2">
         <div className="flex items-center">
-          <Link href={post.url ?? `/item?id=${post.id}`} prefetch>
+          <Link href={post.url ?? `/item?id=${post.id}`}>
             <a className="text-lg">
               <h2>{post.title}</h2>
             </a>
@@ -31,8 +31,8 @@ export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.al
           <Link href={`/user?id=${post.author.id}`}>
             <a className="hover:underline">{post.author.username}</a>
           </Link>{' '}
-          <PostTimestamp date={post.createdAt} /> | <button className="hover:underline">hide</button> |{' '}
-          <Link href={`/item?id=${post.id}`} prefetch>
+          <Timestamp date={post.createdAt} /> | <button className="hover:underline">hide</button> |{' '}
+          <Link href={`/item?id=${post.id}`}>
             <a className="hover:underline">
               {post._count.comments} comment{post._count.comments === 1 ? '' : 's'}
             </a>

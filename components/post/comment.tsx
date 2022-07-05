@@ -1,18 +1,14 @@
 import { CommentUpvoteButton } from 'components/comment-upvote-button';
-import PostTimestamp from 'components/posts-list/post-timestamp';
+import { Timestamp } from 'components/posts-list/timestamp';
 import { useLocalStorageState } from 'helpers/hooks/use-localstorage-state';
 import Link from 'next/link';
-import { PostCommentWithChildren } from 'server/domains/posts/helpers';
+import { PostCommentWithChildren } from 'server/domains/comments/helpers';
 
-const countChildren = (comments: PostCommentWithChildren[]): number => {
-  return comments.length + comments.reduce((acc, comment) => acc + countChildren(comment.comments), 0);
-};
-
-export const Comment = ({ comment, depth = 0 }: { comment: PostCommentWithChildren; depth?: number }) => {
+export const Comment = ({ comment }: { comment: PostCommentWithChildren }) => {
   const [expanded, setExpanded] = useLocalStorageState(['comment', comment.id, 'expanded'], true);
 
   return (
-    <details open={expanded} style={{ marginLeft: depth * 12 }} className="py-2">
+    <details id={comment.id} open={expanded} className="py-2">
       <summary className="flex cursor-pointer list-none items-center">
         <CommentUpvoteButton
           postId={comment.postId}
@@ -22,29 +18,31 @@ export const Comment = ({ comment, depth = 0 }: { comment: PostCommentWithChildr
           visible={expanded}
         />
 
-        <div className="ml-2">
-          <div className="text-sm opacity-60">
-            {comment.author.username} <PostTimestamp date={comment.createdAt} />{' '}
-            <button className="hover:underline" onClick={() => setExpanded(!expanded)}>
-              {expanded ? '[-]' : `[${comment.childCount} more]`}
-            </button>
-          </div>
-        </div>
+        <span className="ml-2 text-sm opacity-60">
+          {comment.author.username} <Timestamp date={comment.createdAt} />{' '}
+          <button className="hover:underline" onClick={() => setExpanded(!expanded)}>
+            {expanded ? '[-]' : `[${comment.childCount} more]`}
+          </button>
+        </span>
       </summary>
 
       {expanded ? (
         <div className="ml-7">
           <p>{comment.content}</p>
 
-          <Link href="/#todo">
+          <Link
+            href={`/reply?id=${comment.id}&goto=${encodeURIComponent(`item?id=${comment.postId}#${comment.postId}`)}`}
+          >
             <a className="text-xs underline">reply</a>
           </Link>
         </div>
       ) : null}
 
-      {comment.comments.map(reply => {
-        return <Comment key={reply.id} comment={reply} depth={depth + 1} />;
-      })}
+      <div className="ml-5">
+        {comment.comments.map(reply => {
+          return <Comment key={reply.id} comment={reply} />;
+        })}
+      </div>
     </details>
   );
 };

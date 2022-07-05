@@ -1,24 +1,35 @@
-import '../styles/globals.css';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import { loggerLink } from '@trpc/client/links/loggerLink';
-import type { AppProps } from 'next/app';
 import { withTRPC } from '@trpc/next';
-import { AppRouter } from 'server/router';
 import { AppLayout } from 'components/layouts/app-layout';
-import superjson from 'superjson';
-import nProgress from 'nprogress';
+import { NextPage } from 'next';
+import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import Router from 'next/router';
+import nProgress from 'nprogress';
+import { AppRouter } from 'server/router';
+import superjson from 'superjson';
+import '../styles/globals.css';
 
 Router.events.on('routeChangeStart', nProgress.start);
 Router.events.on('routeChangeError', nProgress.done);
 Router.events.on('routeChangeComplete', nProgress.done);
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return (
-    <AppLayout>
-      <Component {...pageProps} />
-    </AppLayout>
-  );
+export function reportWebVitals(metric: NextWebVitalsMetric) {
+  console.log(metric.label, metric);
+}
+
+export type NextPageWithLayout<P = unknown, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: React.ReactElement) => React.ReactElement | null;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const getLayout = Component.getLayout || (page => <AppLayout>{page}</AppLayout>);
+
+  return getLayout(<Component {...pageProps} />);
 }
 
 function getBaseUrl() {

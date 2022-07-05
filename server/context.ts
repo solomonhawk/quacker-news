@@ -1,13 +1,9 @@
 import { inferAsyncReturnType } from '@trpc/server';
-import * as trpcNext from '@trpc/server/adapters/next';
 import { prisma } from 'lib/prisma';
 
 type User = { id: string };
 
-export async function createContext({
-  req,
-  res,
-}: trpcNext.CreateNextContextOptions): Promise<{ prisma: typeof prisma; user?: User }> {
+export async function createContext(): Promise<{ prisma: typeof prisma; user?: User }> {
   // Create your context based on the request object
   // Will be available as `ctx` in all your resolvers
 
@@ -29,6 +25,5 @@ export async function createContext({
   };
 }
 
-export type Meta = { requiresAuth?: boolean };
 export type Context = inferAsyncReturnType<typeof createContext>;
 export type AuthedUserContext = Required<Context>;

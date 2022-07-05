@@ -7,7 +7,7 @@ import Head from 'next/head';
 import { appRouter } from 'server/router';
 import superjson from 'superjson';
 
-const Index: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ page }) => {
+const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ page }) => {
   const postsQuery = trpc.useQuery(['post.all', { page }]);
 
   if (postsQuery.isLoading && !postsQuery.data) {
@@ -48,4 +48,4 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
   return { props: { trpcState: ssg.dehydrate(), page } };
 };
 
-export default Index;
+export default IndexPage;

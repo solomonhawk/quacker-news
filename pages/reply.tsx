@@ -1,25 +1,27 @@
-import { Post } from 'components/post';
 import { trpc } from 'lib/trpc';
-import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import { appRouter } from 'server/router';
 import superjson from 'superjson';
 import { createSSGHelpers } from '@trpc/react/ssg';
 import { TRPCError } from '@trpc/server';
 import { prisma } from 'lib/prisma';
+import { CommentReply } from 'components/comment-reply';
+import { ReplyLayout } from 'components/layouts/reply-layout';
+import { NextPageWithLayout } from './_app';
 
-const ItemPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
-  const postQuery = trpc.useQuery(['post.byId', { id }]);
+const ReplyPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
+  const commentQuery = trpc.useQuery(['comment.byId', { id }]);
 
-  if (postQuery.isLoading && !postQuery.data) {
+  if (commentQuery.isLoading && !commentQuery.data) {
     return <div>Loading...</div>;
   }
 
-  if (postQuery.isError || !postQuery.data) {
+  if (commentQuery.isError || !commentQuery.data) {
     return <div>Something went wrong...</div>;
   }
 
-  const pageTitle = `QuackerNews - ${postQuery.data.title}`;
+  const pageTitle = `QuackerNews - Reply to ${commentQuery.data.id}`;
 
   return (
     <>
@@ -29,7 +31,7 @@ const ItemPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Post post={postQuery.data} />
+      <CommentReply comment={commentQuery.data} />
     </>
   );
 };
@@ -45,7 +47,7 @@ export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx 
       transformer: superjson,
     });
 
-    await ssg.fetchQuery('post.byId', { id });
+    await ssg.fetchQuery('comment.byId', { id });
 
     return { props: { trpcState: ssg.dehydrate(), id } };
   } catch (error) {
@@ -61,4 +63,8 @@ export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx 
   }
 };
 
-export default ItemPage;
+ReplyPage.getLayout = function getLayout(page: React.ReactElement) {
+  return <ReplyLayout>{page}</ReplyLayout>;
+};
+
+export default ReplyPage;

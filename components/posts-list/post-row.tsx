@@ -15,7 +15,7 @@ export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.al
         <div className="flex items-center">
           <Link href={post.url ?? `/item?id=${post.id}`}>
             <a className="text-lg">
-              <h2>{post.title}</h2>
+              <h2 className="leading-tight">{post.title}</h2>
             </a>
           </Link>
 

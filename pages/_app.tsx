@@ -31,6 +31,7 @@ function getBaseUrl() {
 }
 
 export default withTRPC<AppRouter>({
+  ssr: false,
   config() {
     return {
       links: [
@@ -47,10 +48,10 @@ export default withTRPC<AppRouter>({
         defaultOptions: {
           queries: {
             refetchOnWindowFocus: false,
+            staleTime: 5 * 60 * 1000, // 5 min
           },
         },
       },
     };
   },
-  ssr: true,
 })(MyApp);

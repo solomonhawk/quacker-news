@@ -9,7 +9,7 @@ datasource db {
 
 model User {
     id             String          @id @default(uuid())
-    email          String
+    email          String          @unique
     username       String
     passwordHash   String          @map("password_hash")
     posts          Post[]
@@ -29,24 +29,25 @@ model Post {
     authorId  String   @map("author_id")
     createdAt DateTime @default(now()) @map("created_at")
 
-    upvotes PostUpvote[]
-    comment Comment[]
+    upvotes  PostUpvote[]
+    comments Comment[]
 
     @@map("posts")
 }
 
 model Comment {
-    id        String          @id @default(uuid())
-    post      Post?           @relation(fields: [postId], references: [id], onDelete: Cascade)
-    postId    String?         @map("post_id")
-    author    User            @relation(fields: [authorId], references: [id])
-    authorId  String          @map("author_id")
+    id        String   @id @default(uuid())
+    post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+    postId    String   @map("post_id")
+    author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    authorId  String   @map("author_id")
     content   String
-    createdAt DateTime        @default(now()) @map("created_at")
-    parent    Comment?        @relation("CommentComments", fields: [parentId], references: [id], onDelete: Cascade)
-    parentId  String?         @map("parent_id")
-    comments  Comment[]       @relation("CommentComments")
-    upvotes   CommentUpvote[]
+    createdAt DateTime @default(now()) @map("created_at")
+    parent    Comment? @relation("CommentComments", fields: [parentId], references: [id], onDelete: Cascade)
+    parentId  String?  @map("parent_id")
+
+    comments Comment[]       @relation("CommentComments")
+    upvotes  CommentUpvote[]
 
     @@index([postId])
     @@index([parentId])
@@ -55,9 +56,9 @@ model Comment {
 
 model PostUpvote {
     id     String @id @default(uuid())
-    user   User   @relation(fields: [userId], references: [id])
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String @map("user_id")
-    post   Post   @relation(fields: [postId], references: [id])
+    post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId String @map("post_id")
 
     @@unique([userId, postId])
@@ -66,11 +67,11 @@ model PostUpvote {
 
 model CommentUpvote {
     id        String  @id @default(uuid())
-    comment   Comment @relation(fields: [commentId], references: [id])
+    user      User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String? @map("user_id")
+    comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
     commentId String  @map("comment_id")
 
-    User   User?   @relation(fields: [userId], references: [id])
-    userId String? @map("user_id")
 
     @@unique([commentId, userId])
     @@map("comment_upvotes")

@@ -21,6 +21,14 @@ export const seed = async (prisma: PrismaClient) => {
       postId: posts[1].id,
       userId: users[0].id,
     },
+    {
+      postId: posts[1].id,
+      userId: users[1].id,
+    },
+    {
+      postId: posts[1].id,
+      userId: users[2].id,
+    },
   ];
 
   await prisma.postUpvote.createMany({

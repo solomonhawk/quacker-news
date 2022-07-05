@@ -19,8 +19,10 @@
     "@trpc/react": "^9.25.3",
     "@trpc/server": "^9.25.3",
     "@types/nprogress": "^0.2.0",
+    "classnames": "^2.3.1",
     "next": "12.2.0",
     "nprogress": "^0.2.0",
+    "query-string": "^7.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-query": "^3.39.1",
@@ -28,6 +30,7 @@
     "zod": "^3.17.3"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^12.2.0",
     "@types/node": "^18.0.0",
     "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5",

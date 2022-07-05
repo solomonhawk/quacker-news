@@ -5,7 +5,7 @@ type UseRequiredQueryParamOptions = {
   redirectTo: string;
 };
 
-export const useRequiredQueryParam = <T>(
+export const useRequiredQueryParam = (
   param: string,
   { redirectTo }: UseRequiredQueryParamOptions = { redirectTo: '/' },
 ) => {
@@ -18,6 +18,10 @@ export const useRequiredQueryParam = <T>(
     }
   }, [router, redirectTo, paramValue]);
 
+  if (!paramValue) {
+    return [];
+  }
+
   // return paramValue ? (paramValue as T) : undefined;
-  return paramValue as T;
+  return Array.isArray(paramValue) ? paramValue : [paramValue];
 };

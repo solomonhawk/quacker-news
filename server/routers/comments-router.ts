@@ -1,6 +1,5 @@
 import { Prisma } from '@prisma/client';
-import * as trpc from '@trpc/server';
-import { prisma } from 'lib/prisma';
+import { createProtectedRouter } from 'server/create-router';
 import { z } from 'zod';
 
 const defaultCommentSelect = Prisma.validator<Prisma.CommentSelect>()({
@@ -9,16 +8,19 @@ const defaultCommentSelect = Prisma.validator<Prisma.CommentSelect>()({
   createdAt: true,
 });
 
-export const commentsRouter = trpc.router().mutation('create', {
-  input: z.object({
-    postId: z.string(),
-    content: z.string(),
-    authorId: z.string(),
-  }),
-  async resolve({ input }) {
-    return prisma.comment.create({
-      data: input,
-      select: defaultCommentSelect,
-    });
-  },
-});
+export const commentsRouter = createProtectedRouter()
+  /**
+   * @description Create comment
+   */
+  .mutation('create', {
+    input: z.object({
+      postId: z.string(),
+      content: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      return ctx.prisma.comment.create({
+        data: { ...input, authorId: ctx.user.id },
+        select: defaultCommentSelect,
+      });
+    },
+  });

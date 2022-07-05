@@ -1,4 +1,5 @@
 import * as trpcNext from '@trpc/server/adapters/next';
+import { createContext } from 'server/context';
 import { appRouter } from 'server/router';
 
 export default trpcNext.createNextApiHandler({
@@ -6,7 +7,7 @@ export default trpcNext.createNextApiHandler({
   batching: {
     enabled: true,
   },
-  createContext: () => null,
+  createContext,
   onError({ error }) {
     if (error.code === 'INTERNAL_SERVER_ERROR') {
       // send to bug reporting

@@ -3,9 +3,11 @@ import { AppHeader } from './app-header';
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <main className="container mx-auto px-4">
-      <AppHeader />
-      {children}
+    <main className="sm:p-2">
+      <div className="sm:container mx-auto sm:px-4">
+        <AppHeader />
+        {children}
+      </div>
     </main>
   );
 };

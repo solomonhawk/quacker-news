@@ -1,8 +1,25 @@
+import { createSSGHelpers } from '@trpc/react/ssg';
 import { PostsList } from 'components/posts-list';
-import type { NextPage } from 'next';
+import { prisma } from 'lib/prisma';
+import { trpc } from 'lib/trpc';
+import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
 import Head from 'next/head';
+import { appRouter } from 'server/router';
+import superjson from 'superjson';
 
-const Index: NextPage = () => {
+const Index: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ page }) => {
+  const postsQuery = trpc.useQuery(['post.all', { page }]);
+
+  if (postsQuery.isLoading && !postsQuery.data) {
+    return <div>Loading...</div>;
+  }
+
+  if (postsQuery.isError || !postsQuery.data) {
+    return <div>Something went wrong...</div>;
+  }
+
+  const hasMorePages = page * postsQuery.data.perPage < postsQuery.data.totalCount;
+
   return (
     <>
       <Head>
@@ -11,9 +28,24 @@ const Index: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <PostsList />
+      <PostsList posts={postsQuery.data.posts} hasMorePages={hasMorePages} nextPageUrl={`/news?p=${page + 1}`} />
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async ctx => {
+  const pageParam = parseInt(ctx.query.page as string, 10);
+  const page = isNaN(pageParam) ? 1 : pageParam;
+
+  const ssg = await createSSGHelpers({
+    router: appRouter,
+    ctx: { prisma, user: undefined },
+    transformer: superjson,
+  });
+
+  await ssg.fetchQuery('post.all', { page });
+
+  return { props: { trpcState: ssg.dehydrate(), page } };
 };
 
 export default Index;

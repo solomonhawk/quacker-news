@@ -1,38 +1,22 @@
-import { Post, Prisma } from '@prisma/client';
-import { trpc } from 'lib/trpc';
-import PostTimestamp from './post-timestamp';
+import { PostUpvoteButton } from 'components/post-upvote-button';
+import { ArrayElement, InferQueryOutput } from 'helpers/trpc';
 import { host } from 'helpers/url';
 import Link from 'next/link';
-import { ArrayElement, InferQueryOutput } from 'helpers/trpc';
+import PostTimestamp from './post-timestamp';
 
 export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.all'>['posts']> }) => {
-  const utils = trpc.useContext();
-
-  const upvotePost = trpc.useMutation('post.upvote.create', {
-    onSuccess: () => {
-      utils.invalidateQueries(['post.all']);
-    },
-  });
-
-  const upvote = async () => {
-    await upvotePost.mutateAsync({
-      postId: post.id,
-      userId: '1219c445-41e5-489d-a842-5633e2c0e09a',
-    });
-  };
-
   return (
     <>
-      <span>{post.position}.</span>
+      <span className="opacity-60">{post.position}.</span>
 
-      <button className="ml-2 opacity-40" onClick={upvote}>
-        ▲
-      </button>
+      <PostUpvoteButton postId={post.id} disabled={false} upvoted={post.upvotes.length > 0} />
 
       <div className="flex flex-col ml-2">
-        <div>
-          <Link href={post.url ?? `/item?id=${post.id}`}>
-            <a>{post.title}</a>
+        <div className="flex items-center">
+          <Link href={post.url ?? `/item?id=${post.id}`} prefetch>
+            <a className="text-lg">
+              <h2>{post.title}</h2>
+            </a>
           </Link>
 
           {post.url ? (
@@ -48,9 +32,9 @@ export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.al
             <a className="hover:underline">{post.author.username}</a>
           </Link>{' '}
           <PostTimestamp date={post.createdAt} /> | <button className="hover:underline">hide</button> |{' '}
-          <Link href={`/item?id=${post.id}`}>
+          <Link href={`/item?id=${post.id}`} prefetch>
             <a className="hover:underline">
-              {post._count.comment} comment{post._count.comment === 1 ? '' : 's'}
+              {post._count.comments} comment{post._count.comments === 1 ? '' : 's'}
             </a>
           </Link>
         </div>

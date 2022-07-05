@@ -1,24 +1,20 @@
-import { usePageNumberQuery } from 'helpers/hooks/use-page-number-query';
-import { trpc } from 'lib/trpc';
+import { InferQueryOutput } from 'helpers/trpc';
 import Link from 'next/link';
 import { PostRow } from './post-row';
 
-export const PostsList = () => {
-  const page = usePageNumberQuery();
-  const postsQuery = trpc.useQuery(['post.all', { page }]);
+type Posts = InferQueryOutput<'post.all'>;
 
-  if (postsQuery.isLoading) {
-    return <div>Loading...</div>;
-  }
+type Props = {
+  posts: Posts['posts'];
+  hasMorePages: boolean;
+  nextPageUrl: string;
+};
 
-  if (postsQuery.isError || !postsQuery.data) {
-    return <div>Something went wrong...</div>;
-  }
-
+export const PostsList = ({ posts, hasMorePages, nextPageUrl }: Props) => {
   return (
     <div className="bg-[#f6f6ef]">
       <ol>
-        {postsQuery.data.posts.map(post => {
+        {posts.map(post => {
           return (
             <li key={post.id} className="flex items-start p-2">
               <PostRow post={post} />
@@ -27,9 +23,13 @@ export const PostsList = () => {
         })}
       </ol>
 
-      <Link href={`/news?p=${page + 1}`}>
-        <a className="link">More</a>
-      </Link>
+      {hasMorePages && (
+        <div className="p-4 ml-4">
+          <Link href={nextPageUrl}>
+            <a className="link">More</a>
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

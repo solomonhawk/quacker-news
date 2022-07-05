@@ -18,21 +18,23 @@ export const AppHeader = () => {
         <Image src="/y18.gif" alt="" width="18" height="18" />
       </span>
 
-      <Link href="/">
-        <a className="leading-none font-bold">
-          <h1>News for Quackers</h1>
-        </a>
-      </Link>
+      <div className="flex flex-col sm:flex-row sm:items-center ml-2 sm:ml-1">
+        <Link href="/">
+          <a className="leading-none font-bold px-1 sm:px-0">
+            <h1>News for Quackers</h1>
+          </a>
+        </Link>
 
-      <nav className="ml-2 divide-x divide-black">
-        {links.map(link => {
-          return (
-            <Link key={link.href} href={link.href}>
-              <a className="px-1">{link.text}</a>
-            </Link>
-          );
-        })}
-      </nav>
+        <nav className="sm:ml-2 divide-x divide-black">
+          {links.map(link => {
+            return (
+              <Link key={link.href} href={link.href}>
+                <a className="px-1">{link.text}</a>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
 
       <Link href="/login">
         <a className="px-1 ml-auto">login</a>

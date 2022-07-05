@@ -40,7 +40,7 @@ export const seed = async (prisma: PrismaClient) => {
       content: 'go back to stack overflow',
       createdAt: new Date(),
       parentId: commentRecords[0].id,
-      postId: null,
+      postId: posts[0].id,
       authorId: users[1].id,
     },
   ];

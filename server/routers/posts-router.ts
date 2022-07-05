@@ -1,81 +1,40 @@
-import * as trpc from '@trpc/server';
-import { prisma } from 'lib/prisma';
-import Trpc from 'pages/api/trpc/[trpc]';
+import { TRPCError } from '@trpc/server';
+import { createRouter } from 'server/create-router';
+import { paginationValidator } from 'server/domains/pagination';
 import { z } from 'zod';
+import * as posts from '../domains/posts';
 
-export const postsRouter = trpc
-  .router()
+export const postsRouter = createRouter()
+  /**
+   * @description Query all posts
+   */
   .query('all', {
-    input: z
-      .object({
-        page: z.number().default(1),
-        perPage: z.number().default(25),
-      })
-      .default({}),
-    async resolve({ input: { page, perPage } }) {
-      const skip = (page - 1) * perPage;
-
-      const [totalCount, posts] = await prisma.$transaction([
-        prisma.post.count(),
-        prisma.post.findMany({
-          skip,
-          take: perPage,
-          select: {
-            id: true,
-            title: true,
-            content: true,
-            createdAt: true,
-            author: {
-              select: {
-                id: true,
-                username: true,
-              },
-            },
-            url: true,
-            _count: true,
-          },
-        }),
-      ]);
-
-      return {
-        page,
-        perPage,
-        totalCount: totalCount,
-        posts: posts.map((post, i) => {
-          return {
-            ...post,
-            position: skip + i + 1,
-          };
-        }),
-      };
+    input: paginationValidator,
+    async resolve({ input: { page, perPage }, ctx }) {
+      try {
+        return await posts.all(page, perPage, ctx.user?.id);
+      } catch (error) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Something went wrong',
+          cause: error,
+        });
+      }
     },
   })
+
+  /**
+   * @description Query post by ID
+   */
   .query('byId', {
     input: z.object({
       id: z.string(),
     }),
-    async resolve({ input: { id } }) {
+    async resolve({ input: { id }, ctx }) {
       try {
-        return prisma.post.findUnique({
-          where: { id },
-          select: {
-            id: true,
-            title: true,
-            content: true,
-            url: true,
-            author: {
-              select: {
-                id: true,
-                username: true,
-              },
-            },
-            createdAt: true,
-            _count: true,
-          },
-          rejectOnNotFound: true,
-        });
+        return await posts.byId(id, ctx.user?.id);
       } catch (error) {
-        throw new trpc.TRPCError({
+        throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Post not found',
           cause: error,

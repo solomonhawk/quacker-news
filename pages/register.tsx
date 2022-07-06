@@ -1,10 +1,19 @@
 import { trpc } from 'lib/trpc';
+import { signIn } from 'next-auth/react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 export const Register = () => {
-  const registerUser = trpc.useMutation('user.create');
+  const router = useRouter();
+
+  const registerUser = trpc.useMutation('user.create', {
+    onSuccess: async (_data, { username, password }) => {
+      await signIn('credentials', { username, password, redirect: false });
+      router.push('/');
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,14 +43,14 @@ export const Register = () => {
         <h1 className="text-xl font-semibold mb-4">Create Account</h1>
 
         <form className="mb-4" onSubmit={handleSubmit}>
-          <div className="mb-1">
+          <div className="mb-2">
             <label className="block" htmlFor="email">
               Email
             </label>
             <input id="email" type="email" name="email" required className="border border-gray-700 rounded-sm p-1" />
           </div>
 
-          <div className="mb-1">
+          <div className="mb-2">
             <label className="block" htmlFor="username">
               Username
             </label>
@@ -54,7 +63,7 @@ export const Register = () => {
             />
           </div>
 
-          <div className="mb-1">
+          <div className="mb-2">
             <label className="block" htmlFor="password">
               Password
             </label>
@@ -80,8 +89,12 @@ export const Register = () => {
             />
           </div>
 
-          <button className="block bg-gray-100 hover:bg-gray-200 active:bg-gray-100 rounded border border-gray-700 px-2 font-mono">
-            Create Account
+          <button
+            type="submit"
+            disabled={registerUser.isLoading}
+            className="block bg-gray-100 hover:bg-gray-200 active:bg-gray-100 disabled:bg-gray-200 rounded border border-gray-700 px-2 font-mono"
+          >
+            {registerUser.isLoading || registerUser.isSuccess ? 'Please wait...' : 'Create Account'}
           </button>
         </form>
 

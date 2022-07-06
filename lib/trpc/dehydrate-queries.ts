@@ -1,8 +1,7 @@
 import { createSSGHelpers } from '@trpc/react/ssg';
 import { TRPCError } from '@trpc/server';
-import { prisma } from 'lib/prisma';
 import { GetServerSidePropsContext } from 'next';
-import { getSession } from 'next-auth/react';
+import { createContext } from 'server/context';
 import { appRouter, AppRouter } from 'server/router';
 import superjson from 'superjson';
 
@@ -20,18 +19,18 @@ export const dehydrateQueries = async (
   ctx: GetServerSidePropsContext,
   fetchData: (ssg: ReturnType<typeof createSSGHelpers<AppRouter>>) => Promise<void>,
 ) => {
-  const session = await getSession({ ctx });
-
   try {
+    const trpcContext = await createContext({ req: ctx.req, res: ctx.res });
+
     const ssg = createSSGHelpers({
       router: appRouter,
-      ctx: { prisma, user: session?.user },
+      ctx: trpcContext,
       transformer: superjson,
     });
 
     await fetchData(ssg);
 
-    return { trpcState: ssg.dehydrate(), session };
+    return { trpcState: ssg.dehydrate(), session: trpcContext.session };
   } catch (error) {
     if (error instanceof TRPCError) {
       if (error.code === 'NOT_FOUND') {

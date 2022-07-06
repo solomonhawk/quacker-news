@@ -11,7 +11,7 @@ export const postUpvotesRouter = createProtectedRouter()
     }),
     async resolve({ input, ctx }) {
       return ctx.prisma.postUpvote.create({
-        data: { ...input, userId: ctx.user.id },
+        data: { ...input, userId: ctx.session.user.id },
       });
     },
   })
@@ -27,7 +27,7 @@ export const postUpvotesRouter = createProtectedRouter()
       return ctx.prisma.postUpvote.delete({
         where: {
           userId_postId: {
-            userId: ctx.user.id,
+            userId: ctx.session.user.id,
             postId,
           },
         },

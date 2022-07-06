@@ -13,7 +13,7 @@ export const commentUpvotesRouter = createProtectedRouter()
       return ctx.prisma.commentUpvote.create({
         data: {
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.session.user.id,
         },
       });
     },
@@ -30,7 +30,7 @@ export const commentUpvotesRouter = createProtectedRouter()
       return ctx.prisma.commentUpvote.delete({
         where: {
           commentId_userId: {
-            userId: ctx.user.id,
+            userId: ctx.session.user.id,
             commentId,
           },
         },

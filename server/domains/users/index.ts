@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { Context } from 'server/context';
+import { RequestlessContext } from 'server/context';
 
 export const defaultUserSelect = Prisma.validator<Prisma.UserSelect>()({
   id: true,
@@ -7,19 +7,19 @@ export const defaultUserSelect = Prisma.validator<Prisma.UserSelect>()({
   username: true,
 });
 
-export const karma = async (ctx: Context) => {
+export const karma = async (ctx: RequestlessContext) => {
   const [postUpvoteCount, commentUpvoteCount] = await ctx.prisma.$transaction([
     ctx.prisma.postUpvote.count({
       where: {
         post: {
-          authorId: ctx.user?.id,
+          authorId: ctx.session?.user?.id,
         },
       },
     }),
     ctx.prisma.commentUpvote.count({
       where: {
         comment: {
-          authorId: ctx.user?.id,
+          authorId: ctx.session?.user?.id,
         },
       },
     }),
@@ -28,7 +28,7 @@ export const karma = async (ctx: Context) => {
   return postUpvoteCount + commentUpvoteCount;
 };
 
-export const byUsername = async (ctx: Context, username: string) => {
+export const byUsername = async (ctx: RequestlessContext, username: string) => {
   return await ctx.prisma.user.findUnique({
     where: {
       username,

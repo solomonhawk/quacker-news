@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { Context } from 'server/context';
+import { RequestlessContext } from 'server/context';
 import { threadComments } from './helpers';
 
 export const commentWithAuthorAndUserUpvote = (userId?: string) => {
@@ -16,7 +16,7 @@ export const commentWithAuthorAndUserUpvote = (userId?: string) => {
 
 export type PostComment = Prisma.CommentGetPayload<ReturnType<typeof commentWithAuthorAndUserUpvote>>;
 
-export async function byId(ctx: Context, id: string) {
+export async function byId(ctx: RequestlessContext, id: string) {
   const [comment, comments] = await ctx.prisma.$transaction(async prisma => {
     const comment = await prisma.comment.findUnique({
       rejectOnNotFound: true,
@@ -39,7 +39,7 @@ export async function byId(ctx: Context, id: string) {
         },
         upvotes: {
           where: {
-            userId: ctx.user?.id,
+            userId: ctx.session?.user?.id,
           },
         },
       },
@@ -50,7 +50,7 @@ export async function byId(ctx: Context, id: string) {
     // being queried.
     const comments = await prisma.comment.findMany({
       where: { postId: comment.postId },
-      ...commentWithAuthorAndUserUpvote(ctx.user?.id),
+      ...commentWithAuthorAndUserUpvote(ctx.session?.user?.id),
     });
 
     return [comment, comments] as const;

@@ -3,9 +3,9 @@ import { MiddlewareFunction } from '@trpc/server/dist/declarations/src/internals
 import { AuthedUserContext, Context } from 'server/context';
 
 export const authMiddleware: MiddlewareFunction<Context, AuthedUserContext, unknown> = async ({ next, ctx }) => {
-  if (!ctx.user) {
+  if (!ctx.session?.user) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
 
-  return next({ ctx: { ...ctx, user: ctx.user } });
+  return next({ ctx: { ...ctx, session: ctx.session } });
 };

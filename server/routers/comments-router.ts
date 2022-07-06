@@ -40,7 +40,7 @@ export const commentsRouter = createRouter()
         input: commentValidator,
         async resolve({ input, ctx }) {
           return ctx.prisma.comment.create({
-            data: { ...input, authorId: ctx.user.id },
+            data: { ...input, authorId: ctx.session.user.id },
             select: defaultCommentSelect,
           });
         },

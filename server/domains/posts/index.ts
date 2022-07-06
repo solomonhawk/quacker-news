@@ -1,8 +1,8 @@
-import { Context } from 'server/context';
+import { RequestlessContext } from 'server/context';
 import { commentWithAuthorAndUserUpvote } from '../comments';
 import { threadComments } from '../comments/helpers';
 
-export async function all(ctx: Context, page: number, perPage: number) {
+export async function all(ctx: RequestlessContext, page: number, perPage: number) {
   const skip = (page - 1) * perPage;
 
   const [totalCount, posts] = await ctx.prisma.$transaction([
@@ -14,7 +14,7 @@ export async function all(ctx: Context, page: number, perPage: number) {
         _count: true,
         upvotes: {
           where: {
-            userId: ctx.user?.id,
+            userId: ctx.session?.user?.id,
           },
         },
         author: {
@@ -41,7 +41,7 @@ export async function all(ctx: Context, page: number, perPage: number) {
   };
 }
 
-export async function byId(ctx: Context, id: string) {
+export async function byId(ctx: RequestlessContext, id: string) {
   const post = await ctx.prisma.post.findUnique({
     rejectOnNotFound: true,
     where: { id },
@@ -49,7 +49,7 @@ export async function byId(ctx: Context, id: string) {
       _count: true,
       upvotes: {
         where: {
-          userId: ctx.user?.id,
+          userId: ctx.session?.user?.id,
         },
       },
       author: {
@@ -58,7 +58,7 @@ export async function byId(ctx: Context, id: string) {
           username: true,
         },
       },
-      comments: commentWithAuthorAndUserUpvote(ctx.user?.id),
+      comments: commentWithAuthorAndUserUpvote(ctx.session?.user?.id),
     },
   });
 

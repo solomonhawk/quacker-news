@@ -14,7 +14,9 @@ import '../styles/globals.css';
 import 'lib/nprogress';
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
-  console.log(metric.label, metric);
+  console.groupCollapsed(`${metric.name}: ${Math.round(metric.value * 10) / 10} ms`);
+  console.table(metric);
+  console.groupEnd();
 }
 
 export type NextPageWithLayout<P = unknown, IP = P> = NextPage<P, IP> & {

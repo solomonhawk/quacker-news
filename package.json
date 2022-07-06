@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint -d . --ext .ts --ext .tsx --max-warnings 0",
-    "postinstall": "npx prisma generate"
+    "postinstall": "npx prisma generate",
+    "vercel:build": "prisma generate && prisma migrate deploy && next build"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

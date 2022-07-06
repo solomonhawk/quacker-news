@@ -7,12 +7,12 @@ import * as users from 'server/domains/users';
 
 export default NextAuth({
   adapter: PrismaAdapter(prisma),
-  secret: process.env.SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
   },
   jwt: {
-    secret: process.env.SECRET,
+    secret: process.env.NEXTAUTH_SECRET,
   },
   pages: {
     signIn: '/login',

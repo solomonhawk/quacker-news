@@ -59,7 +59,7 @@ export const AppHeader = () => {
       )}
 
       {status === 'authenticated' && (
-        <div className="ml-auto">
+        <div className="ml-auto flex-shrink-0">
           <Link href={`/user?id=${session.user?.id}`}>
             <a className="px-1 ml-auto">{session.user?.username}</a>
           </Link>

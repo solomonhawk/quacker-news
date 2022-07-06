@@ -1,7 +1,7 @@
-import { trpc } from 'lib/trpc';
 import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { UserKarma } from './user-karma';
 
 const links = [
   { text: 'welcome', href: '/welcome', requireAuth: true },
@@ -17,12 +17,6 @@ const links = [
 
 export const AppHeader = () => {
   const { data: session, status } = useSession();
-
-  const karmaQuery = trpc.useQuery(['user.karma'], {
-    enabled: status === 'authenticated',
-    staleTime: 5 * 1000, // 5 seconds
-    refetchOnWindowFocus: true,
-  });
 
   return (
     <header className="bg-orange-500 p-[2px] flex items-center">
@@ -64,7 +58,7 @@ export const AppHeader = () => {
             <a className="px-1 ml-auto">{session.user?.username}</a>
           </Link>
 
-          <span>({karmaQuery.data ?? session.user.karma})</span>
+          <UserKarma />
 
           <Link href="/api/auth/signout">
             <a

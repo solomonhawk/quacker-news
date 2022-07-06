@@ -2,6 +2,7 @@ import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { withTRPC } from '@trpc/next';
+import { GlobalProgress } from 'components/global-progress';
 import { AppLayout } from 'components/layouts/app-layout';
 import { NextPage } from 'next';
 import { SessionProvider } from 'next-auth/react';
@@ -25,7 +26,12 @@ type AppPropsWithLayout = AppProps & {
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || (page => <AppLayout>{page}</AppLayout>);
 
-  return <SessionProvider session={pageProps.session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>;
+  return (
+    <SessionProvider session={pageProps.session}>
+      <GlobalProgress />
+      {getLayout(<Component {...pageProps} />)}
+    </SessionProvider>
+  );
 }
 
 function getApiUrl() {

@@ -19,12 +19,12 @@ const ItemPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
       <DefaultQueryCell
         query={postQuery}
         success={({ data }) => {
-          const pageTitle = `QuackerNews - ${data.title}`;
           return (
             <>
               <Head>
-                <title>{pageTitle}</title>
+                <title>{`QuackerNews - ${data.title}`}</title>
               </Head>
+
               <Post post={data} />
             </>
           );

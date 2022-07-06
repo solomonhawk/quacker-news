@@ -1,6 +1,6 @@
-import { TRPCClientErrorLike } from '@trpc/client';
-import NextError from 'next/error';
 import type { AppRouter } from 'server/router';
+import type { TRPCClientErrorLike } from '@trpc/client';
+import NextError from 'next/error';
 import { createQueryCell } from 'helpers/create-query-cell';
 
 const Loading = () => (

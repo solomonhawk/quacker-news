@@ -4,33 +4,37 @@ import { dehydrateQueries } from 'lib/trpc/dehydrate-queries';
 import { trpc } from 'lib/trpc';
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
 import Head from 'next/head';
+import { DefaultQueryCell } from 'components/default-query-cell';
 
 const CommentPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
   const commentQuery = trpc.useQuery(['comment.byId', { id }]);
 
-  if (commentQuery.isLoading && !commentQuery.data) {
-    return <div>Loading...</div>;
-  }
-
-  if (commentQuery.isError || !commentQuery.data) {
-    return <div>Something went wrong...</div>;
-  }
-
-  const pageTitle = `QuackerNews - Comment on ${commentQuery.data.post.title}`;
-
   return (
     <>
       <Head>
-        <title>{pageTitle}</title>
+        <title>QuackerNews - Loading...</title>
         <meta name="description" content="News for quacks" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <CommentReply comment={commentQuery.data} />
+      <DefaultQueryCell
+        query={commentQuery}
+        success={({ data }) => {
+          return (
+            <>
+              <Head>
+                <title>{`QuackerNews - Comment on ${data.post.title}`}</title>
+              </Head>
 
-      {commentQuery.data.comments.map(comment => {
-        return <Comment key={comment.id} comment={comment} />;
-      })}
+              <CommentReply comment={data} />
+
+              {data.comments.map(comment => {
+                return <Comment key={comment.id} comment={comment} />;
+              })}
+            </>
+          );
+        }}
+      />
     </>
   );
 };

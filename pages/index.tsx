@@ -21,8 +21,12 @@ const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>
         isEmpty={({ data }) => data.totalCount === 0}
         empty={() => <div>There are no posts yet - go ahead and add one!</div>}
         success={({ data }) => {
-          const hasMorePages = page * data.perPage < data.totalCount;
-          return <PostsList posts={data.posts} nextPageUrl={hasMorePages ? `/news?p=${page + 1}` : undefined} />;
+          return (
+            <PostsList
+              posts={data.posts}
+              nextPageUrl={page * data.perPage < data.totalCount ? `/news?p=${page + 1}` : undefined}
+            />
+          );
         }}
       />
     </>

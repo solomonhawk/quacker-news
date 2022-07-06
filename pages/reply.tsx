@@ -1,4 +1,5 @@
 import { CommentReply } from 'components/comment-reply';
+import { DefaultQueryCell } from 'components/default-query-cell';
 import { ReplyLayout } from 'components/layouts/reply-layout';
 import { trpc } from 'lib/trpc';
 import { dehydrateQueries } from 'lib/trpc/dehydrate-queries';
@@ -9,25 +10,28 @@ import { NextPageWithLayout } from './_app';
 const ReplyPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
   const commentQuery = trpc.useQuery(['comment.byId', { id }]);
 
-  if (commentQuery.isLoading && !commentQuery.data) {
-    return <div>Loading...</div>;
-  }
-
-  if (commentQuery.isError || !commentQuery.data) {
-    return <div>Something went wrong...</div>;
-  }
-
-  const pageTitle = `QuackerNews - Reply to ${commentQuery.data.id}`;
-
   return (
     <>
       <Head>
-        <title>{pageTitle}</title>
+        <title>QuackerNews - Loading...</title>
         <meta name="description" content="News for quacks" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <CommentReply comment={commentQuery.data} />
+      <DefaultQueryCell
+        query={commentQuery}
+        success={({ data }) => {
+          return (
+            <>
+              <Head>
+                <title>{`QuackerNews - Reply to ${data.id}`}</title>
+              </Head>
+
+              <CommentReply comment={data} />
+            </>
+          );
+        }}
+      />
     </>
   );
 };
@@ -42,7 +46,7 @@ export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx 
   return { props: { ...dataProps, id } };
 };
 
-ReplyPage.getLayout = function getLayout(page: React.ReactElement) {
+ReplyPage.getLayout = (page: React.ReactElement) => {
   return <ReplyLayout>{page}</ReplyLayout>;
 };
 

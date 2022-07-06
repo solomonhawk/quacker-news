@@ -5,15 +5,10 @@ import { withTRPC } from '@trpc/next';
 import { AppLayout } from 'components/layouts/app-layout';
 import { NextPage } from 'next';
 import { SessionProvider } from 'next-auth/react';
-import Router from 'next/router';
-import nProgress from 'nprogress';
 import { AppRouter } from 'server/router';
 import superjson from 'superjson';
 import '../styles/globals.css';
-
-Router.events.on('routeChangeStart', nProgress.start);
-Router.events.on('routeChangeError', nProgress.done);
-Router.events.on('routeChangeComplete', nProgress.done);
+import 'lib/nprogress';
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
   console.log(metric.label, metric);
@@ -43,7 +38,6 @@ function getApiUrl() {
 }
 
 export default withTRPC<AppRouter>({
-  ssr: false,
   config() {
     return {
       links: [
@@ -53,17 +47,10 @@ export default withTRPC<AppRouter>({
         }),
         httpBatchLink({
           url: getApiUrl(),
+          maxBatchSize: 10,
         }),
       ],
       transformer: superjson,
-      queryClientConfig: {
-        defaultOptions: {
-          queries: {
-            refetchOnWindowFocus: false,
-            staleTime: 5 * 60 * 1000, // 5 min
-          },
-        },
-      },
     };
   },
 })(MyApp);

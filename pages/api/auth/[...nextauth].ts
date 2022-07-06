@@ -43,8 +43,6 @@ export default NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials): Promise<User> {
-        console.log('authorize', credentials);
-
         if (!credentials) {
           throw new Error('Invalid request');
         }

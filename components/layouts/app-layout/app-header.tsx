@@ -71,7 +71,7 @@ export const AppHeader = () => {
               className="px-1"
               onClick={e => {
                 e.preventDefault();
-                signOut();
+                signOut({ redirect: false });
               }}
             >
               sign out

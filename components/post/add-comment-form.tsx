@@ -1,5 +1,8 @@
+import { ProtectedLink } from 'components/protected-link';
 import { trpc } from 'lib/trpc';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useCallback, useRef, useState } from 'react';
 import { commentValidator } from 'server/domains/comments/helpers';
 
@@ -11,9 +14,12 @@ type Props = {
 };
 
 export const AddCommentForm = ({ postId, parentId, submitButtonText, onSuccess }: Props) => {
+  const router = useRouter();
+  const { data: session } = useSession();
   const formRef = useRef<HTMLFormElement | null>(null);
   const utils = trpc.useContext();
   const [errors, setErrors] = useState<{ content?: string[] | undefined }>({});
+
   const textareaRef = useCallback((inputElement: HTMLTextAreaElement) => {
     if (inputElement) {
       inputElement.focus();
@@ -21,9 +27,13 @@ export const AddCommentForm = ({ postId, parentId, submitButtonText, onSuccess }
   }, []);
 
   const addComment = trpc.useMutation('comment.create', {
-    onSuccess: () => {
+    onSuccess: async () => {
       utils.invalidateQueries(['post.all']);
       utils.invalidateQueries(['post.byId', { id: postId }]);
+
+      if (router.query.redirect) {
+        await router.push(decodeURIComponent((router.query.redirect as string) || ''));
+      }
 
       if (parentId) {
         utils.invalidateQueries(['comment.byId', { id: parentId }]);
@@ -88,13 +98,27 @@ export const AddCommentForm = ({ postId, parentId, submitButtonText, onSuccess }
         <span className="opacity-60">?</span>
       </p>
 
-      <button
-        type="submit"
-        disabled={addComment.isLoading}
-        className="block bg-gray-100 hover:bg-gray-200 active:bg-gray-100 rounded border border-gray-700 px-2 font-mono"
-      >
-        {submitButtonText}
-      </button>
+      {session ? (
+        <button
+          type="submit"
+          disabled={addComment.isLoading}
+          className="block bg-gray-100 hover:bg-gray-200 active:bg-gray-100 rounded border border-gray-700 px-2 font-mono"
+        >
+          {submitButtonText}
+        </button>
+      ) : (
+        <ProtectedLink
+          href={
+            parentId
+              ? `/reply?id=${parentId}&redirect=${encodeURIComponent(`item?id=${postId}#${parentId}`)}`
+              : `/reply?id=${postId}`
+          }
+        >
+          <a className="inline-block bg-gray-100 hover:bg-gray-200 active:bg-gray-100 rounded border border-gray-700 px-2 font-mono">
+            {submitButtonText}
+          </a>
+        </ProtectedLink>
+      )}
     </form>
   );
 };

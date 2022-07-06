@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 export const Login: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ csrfToken }) => {
   const {
-    query: { error },
+    query: { error, redirect },
   } = useRouter();
 
   return (
@@ -20,13 +20,14 @@ export const Login: NextPage<InferGetServerSidePropsType<typeof getServerSidePro
       <div className="bg-[#f6f6ef] p-4">
         <h1 className="text-xl font-semibold mb-4">Log In</h1>
 
-        {error ? (
+        {error && (
           <p role="alert" className="font-bold text-red-500 my-2">
             {error}
           </p>
-        ) : null}
+        )}
 
         <form method="post" action="/api/auth/callback/credentials" className="mb-4">
+          {redirect && <input name="callbackUrl" type="hidden" defaultValue={redirect as string} />}
           <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
 
           <div className="mb-1">

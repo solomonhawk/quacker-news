@@ -31,7 +31,9 @@ export const Comment = ({ comment }: { comment: PostCommentWithChildren }) => {
           <p>{comment.content}</p>
 
           <Link
-            href={`/reply?id=${comment.id}&goto=${encodeURIComponent(`item?id=${comment.postId}#${comment.postId}`)}`}
+            href={`/reply?id=${comment.id}&redirect=${encodeURIComponent(
+              `item?id=${comment.postId}#${comment.postId}`,
+            )}`}
           >
             <a className="text-xs underline">reply</a>
           </Link>

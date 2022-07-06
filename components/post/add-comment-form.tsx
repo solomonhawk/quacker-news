@@ -111,7 +111,7 @@ export const AddCommentForm = ({ postId, parentId, submitButtonText, onSuccess }
           href={
             parentId
               ? `/reply?id=${parentId}&redirect=${encodeURIComponent(`item?id=${postId}#${parentId}`)}`
-              : `/reply?id=${postId}`
+              : `/item?id=${postId}`
           }
         >
           <a className="inline-block bg-gray-100 hover:bg-gray-200 active:bg-gray-100 rounded border border-gray-700 px-2 font-mono">

@@ -1,8 +1,7 @@
+import NextError from 'next/error';
 import { useRouter } from 'next/router';
 import React from 'react';
-import type { FallbackProps } from 'react-error-boundary';
 import { ErrorBoundary } from 'react-error-boundary';
-import NextError from 'next/error';
 import { QueryErrorResetBoundary } from 'react-query';
 
 export const ErrorBoundaryExceptional = ({ children }: { children: React.ReactNode }) => {

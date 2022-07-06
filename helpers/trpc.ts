@@ -1,5 +1,3 @@
-// trpc-helper.ts
-
 import type { inferProcedureOutput, inferProcedureInput, inferSubscriptionOutput } from '@trpc/server';
 import type { AppRouter } from 'server/router';
 

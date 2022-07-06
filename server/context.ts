@@ -1,4 +1,4 @@
-import { inferAsyncReturnType } from '@trpc/server';
+import type { inferAsyncReturnType } from '@trpc/server';
 import * as trpcNext from '@trpc/server/adapters/next';
 import { prisma } from 'lib/prisma';
 import { GetServerSidePropsContext } from 'next';

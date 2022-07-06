@@ -16,7 +16,4 @@ export const appRouter = createRouter()
   .merge('comment.', commentsRouter)
   .merge('comment.upvote.', commentUpvotesRouter);
 
-// only export *type signature* of router!
-// to avoid accidentally importing your API
-// into client-side code
 export type AppRouter = typeof appRouter;

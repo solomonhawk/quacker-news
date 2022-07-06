@@ -2,6 +2,8 @@ import type { AppProps, NextWebVitalsMetric } from 'next/app';
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { withTRPC } from '@trpc/next';
+import { ErrorBoundaryAuth } from 'components/error-boundaries/auth';
+import { ErrorBoundaryExceptional } from 'components/error-boundaries/exceptional';
 import { GlobalProgress } from 'components/global-progress';
 import { AppLayout } from 'components/layouts/app-layout';
 import { NextPage } from 'next';
@@ -23,13 +25,15 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || (page => <AppLayout>{page}</AppLayout>);
 
   return (
     <SessionProvider session={pageProps.session}>
       <GlobalProgress />
-      {getLayout(<Component {...pageProps} />)}
+      <ErrorBoundaryExceptional>
+        <ErrorBoundaryAuth>{getLayout(<Component {...pageProps} />)}</ErrorBoundaryAuth>
+      </ErrorBoundaryExceptional>
     </SessionProvider>
   );
 }
@@ -57,6 +61,16 @@ export default withTRPC<AppRouter>({
         }),
       ],
       transformer: superjson,
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            useErrorBoundary: true,
+          },
+          mutations: {
+            useErrorBoundary: true,
+          },
+        },
+      },
     };
   },
-})(MyApp);
+})(App);

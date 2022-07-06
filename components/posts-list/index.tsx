@@ -6,11 +6,10 @@ type Posts = InferQueryOutput<'post.all'>;
 
 type Props = {
   posts: Posts['posts'];
-  hasMorePages: boolean;
-  nextPageUrl: string;
+  nextPageUrl?: string;
 };
 
-export const PostsList = ({ posts, hasMorePages, nextPageUrl }: Props) => {
+export const PostsList = ({ posts, nextPageUrl }: Props) => {
   return (
     <div className="bg-[#f6f6ef]">
       <ol className="py-1">
@@ -23,7 +22,7 @@ export const PostsList = ({ posts, hasMorePages, nextPageUrl }: Props) => {
         })}
       </ol>
 
-      {hasMorePages && (
+      {nextPageUrl && (
         <div className="p-4 ml-4">
           <Link href={nextPageUrl}>
             <a className="link">More</a>

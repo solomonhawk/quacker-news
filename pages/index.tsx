@@ -1,3 +1,4 @@
+import { DefaultQueryCell } from 'components/default-query-cell';
 import { PostsList } from 'components/posts-list';
 import { trpc } from 'lib/trpc';
 import { dehydrateQueries } from 'lib/trpc/dehydrate-queries';
@@ -7,16 +8,6 @@ import Head from 'next/head';
 const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ page }) => {
   const postsQuery = trpc.useQuery(['post.all', { page }]);
 
-  if (postsQuery.isLoading && !postsQuery.data) {
-    return <div>Loading...</div>;
-  }
-
-  if (postsQuery.isError || !postsQuery.data) {
-    return <div>Something went wrong...</div>;
-  }
-
-  const hasMorePages = page * postsQuery.data.perPage < postsQuery.data.totalCount;
-
   return (
     <>
       <Head>
@@ -25,7 +16,15 @@ const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <PostsList posts={postsQuery.data.posts} hasMorePages={hasMorePages} nextPageUrl={`/news?p=${page + 1}`} />
+      <DefaultQueryCell
+        query={postsQuery}
+        isEmpty={({ data }) => data.totalCount === 0}
+        empty={() => <div>There are no posts yet - go ahead and add one!</div>}
+        success={({ data }) => {
+          const hasMorePages = page * data.perPage < data.totalCount;
+          return <PostsList posts={data.posts} nextPageUrl={hasMorePages ? `/news?p=${page + 1}` : undefined} />;
+        }}
+      />
     </>
   );
 };

@@ -1,12 +1,8 @@
-import { createSSGHelpers } from '@trpc/react/ssg';
 import { PostsList } from 'components/posts-list';
-import { prisma } from 'lib/prisma';
 import { trpc } from 'lib/trpc';
+import { dehydrateQueries } from 'lib/trpc/dehydrate-queries';
 import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
-import { getSession } from 'next-auth/react';
 import Head from 'next/head';
-import { appRouter } from 'server/router';
-import superjson from 'superjson';
 
 const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ page }) => {
   const postsQuery = trpc.useQuery(['post.all', { page }]);
@@ -35,20 +31,14 @@ const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>
 };
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
-  const session = await getSession({ ctx });
   const pageParam = parseInt(ctx.query.page as string, 10);
   const page = isNaN(pageParam) ? 1 : pageParam;
 
-  const ssg = await createSSGHelpers({
-    router: appRouter,
-    // @TODO(shawk): get user id from session
-    ctx: { prisma, user: session?.user },
-    transformer: superjson,
+  const dataProps = await dehydrateQueries(ctx, async ssg => {
+    await ssg.fetchQuery('post.all', { page });
   });
 
-  await ssg.fetchQuery('post.all', { page });
-
-  return { props: { trpcState: ssg.dehydrate(), page } };
+  return { props: { ...dataProps, page } };
 };
 
 export default IndexPage;

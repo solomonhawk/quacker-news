@@ -1,15 +1,10 @@
-import { trpc } from 'lib/trpc';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import Head from 'next/head';
-import { appRouter } from 'server/router';
-import superjson from 'superjson';
-import { createSSGHelpers } from '@trpc/react/ssg';
-import { TRPCError } from '@trpc/server';
-import { prisma } from 'lib/prisma';
 import { CommentReply } from 'components/comment-reply';
 import { ReplyLayout } from 'components/layouts/reply-layout';
+import { trpc } from 'lib/trpc';
+import { dehydrateQueries } from 'lib/trpc/dehydrate-queries';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import Head from 'next/head';
 import { NextPageWithLayout } from './_app';
-import { getSession } from 'next-auth/react';
 
 const ReplyPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
   const commentQuery = trpc.useQuery(['comment.byId', { id }]);
@@ -39,29 +34,12 @@ const ReplyPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServer
 
 export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx => {
   const id = ctx.query.id as string;
-  const session = await getSession({ ctx });
 
-  try {
-    const ssg = await createSSGHelpers({
-      router: appRouter,
-      ctx: { prisma, user: session?.user },
-      transformer: superjson,
-    });
-
+  const dataProps = await dehydrateQueries(ctx, async ssg => {
     await ssg.fetchQuery('comment.byId', { id });
+  });
 
-    return { props: { trpcState: ssg.dehydrate(), id } };
-  } catch (error) {
-    if (error instanceof TRPCError) {
-      if (error.code === 'NOT_FOUND') {
-        return {
-          notFound: true,
-        };
-      }
-    }
-
-    throw error;
-  }
+  return { props: { ...dataProps, id } };
 };
 
 ReplyPage.getLayout = function getLayout(page: React.ReactElement) {

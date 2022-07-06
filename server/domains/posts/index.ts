@@ -16,6 +16,9 @@ export async function all(ctx: RequestlessContext, page: number, perPage: number
           where: {
             userId: ctx.session?.user?.id,
           },
+          select: {
+            id: true,
+          },
         },
         author: {
           select: {
@@ -35,6 +38,7 @@ export async function all(ctx: RequestlessContext, page: number, perPage: number
     posts: posts.map((post, i) => {
       return {
         ...post,
+        upvoted: ctx.session?.user?.id ? post.upvotes.length > 0 : false,
         position: skip + i + 1,
       };
     }),
@@ -51,6 +55,9 @@ export async function byId(ctx: RequestlessContext, id: string) {
         where: {
           userId: ctx.session?.user?.id,
         },
+        select: {
+          id: true,
+        },
       },
       author: {
         select: {
@@ -64,6 +71,7 @@ export async function byId(ctx: RequestlessContext, id: string) {
 
   return {
     ...post,
+    upvoted: ctx.session?.user?.id ? post.upvotes.length > 0 : false,
     comments: threadComments(post.comments),
   };
 }

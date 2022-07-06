@@ -12,7 +12,7 @@ export const Post = ({ post }: { post: PostQueryById }) => {
   return (
     <div className="bg-[#f6f6ef] p-2">
       <div className="flex items-start mb-4">
-        <PostUpvoteButton postId={post.id} disabled={false} upvoted={post.upvotes.length > 0} />
+        <PostUpvoteButton postId={post.id} disabled={false} upvoted={post.upvoted} />
 
         <div className="flex flex-col ml-2">
           <div className="flex items-center">

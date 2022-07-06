@@ -9,7 +9,7 @@ export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.al
     <>
       <span className="opacity-60 font-mono">{post.position}.</span>
 
-      <PostUpvoteButton postId={post.id} disabled={false} upvoted={post.upvotes.length > 0} />
+      <PostUpvoteButton postId={post.id} disabled={false} upvoted={post.upvoted} />
 
       <div className="flex flex-col ml-2">
         <div className="flex items-center">

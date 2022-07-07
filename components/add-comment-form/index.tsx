@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useRef, useState } from 'react';
-import { commentValidator } from 'server/domains/comments/helpers';
+import { createCommentSchema } from 'server/domains/comments/helpers';
 
 type Props = {
   postId: string;
@@ -49,7 +49,7 @@ export const AddCommentForm = ({ postId, parentId, submitButtonText, onSuccess }
     }
 
     const formData = new FormData(formRef.current);
-    const validation = commentValidator.safeParse({
+    const validation = createCommentSchema.safeParse({
       postId,
       parentId,
       content: (formData.get('content') as string) || undefined,

@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-export const commentValidator = z.object({
+export const createCommentSchema = z.object({
   postId: z.string(),
   parentId: z.string().optional(),
   content: z

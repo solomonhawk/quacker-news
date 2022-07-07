@@ -21,4 +21,19 @@ if (process.env.NODE_ENV === 'production') {
   prisma = global.prisma;
 }
 
+export const QueryError = {
+  UniqueConstraintViolation: 'P2002',
+} as const;
+
+interface UniqueConstraintViolation {
+  code: 'P2002';
+  meta: {
+    target: string[];
+  };
+}
+
+export const isUniqueConstraintViolation = (error: { code: string }): error is UniqueConstraintViolation => {
+  return error.code === QueryError.UniqueConstraintViolation;
+};
+
 export { prisma };

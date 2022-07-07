@@ -9,14 +9,17 @@ export const authRouter = createRouter().mutation('register', {
     username: z.string(),
     password: z.string(),
   }),
+  meta: {
+    resourceName: 'session',
+  },
   async resolve({ input: { email, username, password }, ctx }) {
     return ctx.prisma.user.create({
+      select: defaultUserSelect,
       data: {
         email,
         username,
         passwordHash: await bcrypt.hash(password, 10),
       },
-      select: defaultUserSelect,
     });
   },
 });

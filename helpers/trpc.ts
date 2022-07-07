@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import type { inferProcedureOutput, inferProcedureInput, inferSubscriptionOutput } from '@trpc/server';
 import type { AppRouter } from 'server/router';
 
@@ -72,3 +73,11 @@ export type InferSubscriptionInput<TRouteKey extends TSubscription> = inferProce
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
   : never;
+
+interface NotFoundError extends TRPCError {
+  code: 'NOT_FOUND';
+}
+
+export const isNotFoundError = (error: unknown): error is NotFoundError => {
+  return error instanceof TRPCError && error.code === 'NOT_FOUND';
+};

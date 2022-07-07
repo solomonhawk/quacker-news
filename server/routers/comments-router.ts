@@ -1,9 +1,8 @@
 import { Prisma } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
-import * as comments from '../domains/comments';
-import { createRouter, createProtectedRouter } from 'server/create-router';
+import { createProtectedRouter, createRouter } from 'server/create-router';
 import { createCommentSchema } from 'server/domains/comments/helpers';
 import * as z from 'zod';
+import * as comments from '../domains/comments';
 
 const defaultCommentSelect = Prisma.validator<Prisma.CommentSelect>()({
   id: true,
@@ -19,16 +18,11 @@ export const commentsRouter = createRouter()
     input: z.object({
       id: z.string(),
     }),
+    meta: {
+      resourceName: 'comment',
+    },
     async resolve({ input: { id }, ctx }) {
-      try {
-        return await comments.byId(ctx, id);
-      } catch (error) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Comment not found',
-          cause: error,
-        });
-      }
+      return comments.byId(ctx, id);
     },
   })
   .merge(
@@ -38,6 +32,9 @@ export const commentsRouter = createRouter()
        */
       .mutation('create', {
         input: createCommentSchema,
+        meta: {
+          resourceName: 'comment',
+        },
         async resolve({ input, ctx }) {
           return ctx.prisma.comment.create({
             data: { ...input, authorId: ctx.session.user.id },

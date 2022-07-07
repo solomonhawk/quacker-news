@@ -13,6 +13,9 @@ export const usersRouter = createRouter()
     input: z.object({
       id: z.string(),
     }),
+    meta: {
+      resourceName: 'user',
+    },
     async resolve({ input: { id }, ctx }) {
       const user = ctx.prisma.user.findUnique({
         where: { id },
@@ -39,6 +42,9 @@ export const usersRouter = createRouter()
       username: z.string(),
       password: z.string(),
     }),
+    meta: {
+      resourceName: 'user',
+    },
     async resolve({ input: { email, username, password }, ctx }) {
       return await ctx.prisma.user.create({
         data: {
@@ -56,6 +62,9 @@ export const usersRouter = createRouter()
    */
   .merge(
     createProtectedRouter().query('karma', {
+      meta: {
+        resourceName: 'user',
+      },
       async resolve({ ctx }) {
         return await users.karma(ctx);
       },

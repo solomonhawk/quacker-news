@@ -41,8 +41,9 @@ export const Post = ({ post }: { post: PostQueryById }) => {
             <Timestamp date={post.createdAt} /> | <button className="hover:underline">hide</button> |{' '}
             <Link href={`/item?id=${post.id}`}>
               <a className="hover:underline">
-                {post._count.comments} comment
-                {post._count.comments === 1 ? '' : 's'}
+                {post._count.comments === 0
+                  ? 'discuss'
+                  : `${post._count.comments} comment${post._count.comments === 1 ? '' : 's'}`}
               </a>
             </Link>
           </div>

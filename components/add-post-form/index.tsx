@@ -15,12 +15,6 @@ export const AddPostForm = () => {
     content?: string[] | undefined;
   }>({});
 
-  const textareaRef = useCallback((inputElement: HTMLTextAreaElement) => {
-    if (inputElement) {
-      inputElement.focus();
-    }
-  }, []);
-
   const addPost = trpc.useMutation('post.create', {
     onSuccess: async post => {
       return router.push(`/item?id=${post.id}`);
@@ -94,8 +88,6 @@ export const AddPostForm = () => {
 
           <textarea
             name="content"
-            ref={textareaRef}
-            disabled={addPost.isLoading}
             className="block w-full max-w-xl border border-gray-700 rounded text-lg p-2 mb-2"
             onKeyDown={handleKeyDown}
             rows={8}

@@ -47,9 +47,9 @@ function getApiUrl() {
     return '/api/trpc';
   }
 
-  // if (process.env.NODE_ENV === 'production') {
-  //   return `${process.env.VERCEL_URL}/api/trpc`;
-  // }
+  if (process.env.VERCEL_URL) {
+    return `${process.env.VERCEL_URL}/api/trpc`;
+  }
 
   // assume localhost
   return `http://localhost:${process.env.PORT ?? 3000}/api/trpc`;

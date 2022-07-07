@@ -15,5 +15,11 @@ export const UserKarma = () => {
     return null;
   }
 
-  return <DefaultQueryCell query={karmaQuery} success={({ data }) => <span>({data ?? session.user.karma})</span>} />;
+  return (
+    <DefaultQueryCell
+      query={karmaQuery}
+      loading={() => <span>(..)</span>}
+      success={({ data }) => <span>({data ?? session.user.karma})</span>}
+    />
+  );
 };

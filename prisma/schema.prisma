@@ -1,122 +1,117 @@
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["interactiveTransactions"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? @db.Text
-    access_token      String? @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
-    @@map("accounts")
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@map("sessions")
+  @@map("sessions")
 }
 
 model User {
-    id            String    @id @default(uuid())
-    email         String    @unique
-    emailVerified DateTime?
-    username      String    @unique
-    passwordHash  String    @map("password_hash")
+  id             String          @id @default(uuid())
+  email          String          @unique
+  emailVerified  DateTime?
+  username       String          @unique
+  passwordHash   String          @map("password_hash")
+  accounts       Account[]
+  commentUpvotes CommentUpvote[]
+  comments       Comment[]
+  postUpvotes    PostUpvote[]
+  posts          Post[]
+  sessions       Session[]
 
-    posts          Post[]
-    postUpvotes    PostUpvote[]
-    comments       Comment[]
-    commentUpvotes CommentUpvote[]
-    accounts       Account[]
-    sessions       Session[]
-
-    @@map("users")
+  @@map("users")
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-
-    @@unique([identifier, token])
-    @@map("verification_tokens")
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 model Post {
-    id        String   @id @default(uuid())
-    title     String
-    content   String?
-    url       String?
-    author    User     @relation(fields: [authorId], references: [id])
-    authorId  String   @map("author_id")
-    createdAt DateTime @default(now()) @map("created_at")
+  id        String       @id @default(uuid())
+  title     String?
+  content   String?
+  url       String?      @unique
+  authorId  String       @map("author_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+  author    User         @relation(fields: [authorId], references: [id])
+  comments  Comment[]
+  upvotes   PostUpvote[]
 
-    upvotes  PostUpvote[]
-    comments Comment[]
-
-    @@map("posts")
+  @@map("posts")
 }
 
 model Comment {
-    id        String   @id @default(uuid())
-    post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-    postId    String   @map("post_id")
-    author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-    authorId  String   @map("author_id")
-    content   String
-    createdAt DateTime @default(now()) @map("created_at")
-    parent    Comment? @relation("CommentComments", fields: [parentId], references: [id], onDelete: Cascade)
-    parentId  String?  @map("parent_id")
+  id        String          @id @default(uuid())
+  postId    String          @map("post_id")
+  authorId  String          @map("author_id")
+  content   String
+  createdAt DateTime        @default(now()) @map("created_at")
+  parentId  String?         @map("parent_id")
+  author    User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent    Comment?        @relation("CommentComments", fields: [parentId], references: [id], onDelete: Cascade)
+  post      Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  upvotes   CommentUpvote[]
+  comments  Comment[]       @relation("CommentComments")
 
-    comments Comment[]       @relation("CommentComments")
-    upvotes  CommentUpvote[]
-
-    @@index([postId])
-    @@index([parentId])
-    @@map("comments")
+  @@index([postId])
+  @@index([parentId])
+  @@map("comments")
 }
 
 model PostUpvote {
-    id     String @id @default(uuid())
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId String @map("user_id")
-    post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
-    postId String @map("post_id")
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  postId String @map("post_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([userId, postId])
-    @@map("post_upvotes")
+  @@unique([userId, postId])
+  @@map("post_upvotes")
 }
 
 model CommentUpvote {
-    id        String  @id @default(uuid())
-    user      User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId    String? @map("user_id")
-    comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-    commentId String  @map("comment_id")
+  id        String  @id @default(uuid())
+  userId    String? @map("user_id")
+  commentId String  @map("comment_id")
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-
-    @@unique([commentId, userId])
-    @@map("comment_upvotes")
+  @@unique([commentId, userId])
+  @@map("comment_upvotes")
 }

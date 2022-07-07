@@ -36,12 +36,7 @@ const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const pageParam = parseInt(ctx.query.page as string, 10);
   const page = isNaN(pageParam) ? 1 : pageParam;
-
-  const dataProps = await dehydrateQueries(ctx, async ssg => {
-    await ssg.fetchQuery('post.all', { page });
-  });
-
-  return { props: { ...dataProps, page } };
+  return dehydrateQueries(ctx, async ssg => await ssg.fetchQuery('post.all', { page }), { page });
 };
 
 export default IndexPage;

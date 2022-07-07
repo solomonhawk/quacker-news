@@ -5,6 +5,7 @@ import { trpc } from 'lib/trpc';
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
 import Head from 'next/head';
 import { DefaultQueryCell } from 'components/default-query-cell';
+import { PageTitle } from 'components/page-title';
 
 const CommentPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
   const commentQuery = trpc.useQuery(['comment.byId', { id }]);
@@ -20,11 +21,18 @@ const CommentPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
       <DefaultQueryCell
         query={commentQuery}
         success={({ data }) => {
+          if (!data) {
+            return (
+              <>
+                <PageTitle>{`QuackerNews - Comment Not Found`}</PageTitle>
+                <div>Comment not found</div>
+              </>
+            );
+          }
+
           return (
             <>
-              <Head>
-                <title>{`QuackerNews - Comment on ${data.post.title}`}</title>
-              </Head>
+              <PageTitle>{`QuackerNews - Comment on ${data.post.title}`}</PageTitle>
 
               <CommentReply comment={data} />
 
@@ -39,16 +47,9 @@ const CommentPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
   );
 };
 
-export const getServerSideProps: GetServerSideProps<{
-  id: string;
-}> = async ctx => {
+export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx => {
   const id = ctx.query.id as string;
-
-  const dataProps = await dehydrateQueries(ctx, async ssg => {
-    await ssg.fetchQuery('comment.byId', { id });
-  });
-
-  return { props: { ...dataProps, id } };
+  return dehydrateQueries(ctx, async ssg => await ssg.fetchQuery('comment.byId', { id }), { id });
 };
 
 export default CommentPage;

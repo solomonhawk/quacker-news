@@ -1,6 +1,8 @@
 import { TRPCError } from '@trpc/server';
 import type { inferProcedureOutput, inferProcedureInput, inferSubscriptionOutput } from '@trpc/server';
 import type { AppRouter } from 'server/router';
+import { DehydratedState } from 'react-query';
+import { Session } from 'next-auth';
 
 /**
  * Enum containing all api query paths
@@ -73,6 +75,11 @@ export type InferSubscriptionInput<TRouteKey extends TSubscription> = inferProce
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
   : never;
+
+export type ServerSideDataProps<T> = {
+  trpcState?: DehydratedState;
+  session?: Session | null;
+} & T;
 
 interface NotFoundError extends TRPCError {
   code: 'NOT_FOUND';

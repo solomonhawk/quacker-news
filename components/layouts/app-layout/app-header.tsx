@@ -35,7 +35,7 @@ export const AppHeader = () => {
 
         <nav className="sm:ml-2 divide-x divide-black flex flex-wrap py-1">
           {links
-            .filter(link => (status !== 'authenticated' ? !link.requireAuth : true))
+            .filter(link => (session ? true : !link.requireAuth))
             .map(link => {
               return (
                 <Link key={link.href} href={link.href}>
@@ -52,7 +52,7 @@ export const AppHeader = () => {
         </Link>
       )}
 
-      {status === 'authenticated' && (
+      {session && (
         <div className="ml-auto flex-shrink-0">
           <Link href={`/user?id=${session.user?.id}`}>
             <a className="px-1 ml-auto">{session.user?.username}</a>

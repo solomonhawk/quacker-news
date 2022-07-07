@@ -19,7 +19,6 @@ export const AddPostForm = () => {
     onSuccess: async post => {
       return router.push(`/item?id=${post.id}`);
     },
-    useErrorBoundary: false,
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement | HTMLTextAreaElement>) => {
@@ -37,7 +36,11 @@ export const AddPostForm = () => {
     });
 
     if (validation.success) {
-      return addPost.mutateAsync(validation.data);
+      return addPost.mutateAsync(validation.data).catch(e => {
+        if (e.code !== 'CONFLICT') {
+          throw e;
+        }
+      });
     }
 
     setErrors(validation.error.formErrors.fieldErrors);

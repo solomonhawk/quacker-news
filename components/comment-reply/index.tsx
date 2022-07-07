@@ -6,7 +6,7 @@ import { InferQueryOutput } from 'helpers/trpc';
 import Link from 'next/link';
 
 type Props = {
-  comment: InferQueryOutput<'comment.byId'>;
+  comment: NonNullable<InferQueryOutput<'comment.byId'>>;
 };
 
 export const CommentReply = ({ comment }: Props) => {

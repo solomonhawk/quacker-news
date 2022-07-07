@@ -1,4 +1,5 @@
 import { DefaultQueryCell } from 'components/default-query-cell';
+import { PageTitle } from 'components/page-title';
 import { Post } from 'components/post';
 import { trpc } from 'lib/trpc';
 import { dehydrateQueries } from 'lib/trpc/dehydrate-queries';
@@ -19,12 +20,18 @@ const ItemPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
       <DefaultQueryCell
         query={postQuery}
         success={({ data }) => {
+          if (!data) {
+            return (
+              <>
+                <PageTitle>{`QuackerNews - Post Not Found`}</PageTitle>
+                <div>Post not found</div>
+              </>
+            );
+          }
+
           return (
             <>
-              <Head>
-                <title>{`QuackerNews - ${data.title}`}</title>
-              </Head>
-
+              <PageTitle>{`QuackerNews - ${data.title}`}</PageTitle>
               <Post post={data} />
             </>
           );
@@ -34,16 +41,9 @@ const ItemPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
   );
 };
 
-export const getServerSideProps: GetServerSideProps<{
-  id: string;
-}> = async ctx => {
+export const getServerSideProps: GetServerSideProps<{ id: string }> = async ctx => {
   const id = ctx.query.id as string;
-
-  const dataProps = await dehydrateQueries(ctx, async ssg => {
-    await ssg.fetchQuery('post.byId', { id });
-  });
-
-  return { props: { ...dataProps, id } };
+  return dehydrateQueries(ctx, async ssg => await ssg.fetchQuery('post.byId', { id }), { id });
 };
 
 export default ItemPage;

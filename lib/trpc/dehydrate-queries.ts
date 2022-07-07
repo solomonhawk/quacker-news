@@ -1,5 +1,5 @@
 import { createSSGHelpers } from '@trpc/react/ssg';
-import { TRPCError } from '@trpc/server';
+import { ServerSideDataProps } from 'helpers/trpc';
 import { GetServerSidePropsContext } from 'next';
 import { createContext } from 'server/context';
 import { appRouter, AppRouter } from 'server/router';
@@ -15,31 +15,26 @@ import superjson from 'superjson';
  * @param fetchData async callback to fetch data during `getServerSideProps`
  * @returns props to be passed to the component
  */
-export const dehydrateQueries = async (
+export const dehydrateQueries = async <T extends Record<string, unknown>>(
   ctx: GetServerSidePropsContext,
-  fetchData: (ssg: ReturnType<typeof createSSGHelpers<AppRouter>>) => Promise<void>,
-) => {
-  try {
-    const trpcContext = await createContext({ req: ctx.req, res: ctx.res });
+  fetchData: (ssg: ReturnType<typeof createSSGHelpers<AppRouter>>) => Promise<unknown>,
+  includeProps: T = {} as T,
+): Promise<{ props: ServerSideDataProps<T> }> => {
+  const trpcContext = await createContext({ req: ctx.req, res: ctx.res });
 
-    const ssg = createSSGHelpers({
-      router: appRouter,
-      ctx: trpcContext,
-      transformer: superjson,
-    });
+  const ssg = createSSGHelpers({
+    router: appRouter,
+    ctx: trpcContext,
+    transformer: superjson,
+  });
 
-    await fetchData(ssg);
+  await fetchData(ssg);
 
-    return { trpcState: ssg.dehydrate(), session: trpcContext.session };
-  } catch (error) {
-    if (error instanceof TRPCError) {
-      if (error.code === 'NOT_FOUND') {
-        return {
-          notFound: true,
-        };
-      }
-    }
-
-    throw error;
-  }
+  return {
+    props: {
+      ...(includeProps || {}),
+      session: trpcContext.session,
+      trpcState: ssg.dehydrate(),
+    },
+  };
 };

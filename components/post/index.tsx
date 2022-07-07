@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { AddCommentForm } from '../add-comment-form';
 import { Comment } from './comment';
 
-type PostQueryById = InferQueryOutput<'post.byId'>;
+type PostQueryById = NonNullable<InferQueryOutput<'post.byId'>>;
 
 export const Post = ({ post }: { post: PostQueryById }) => {
   return (

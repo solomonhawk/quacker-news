@@ -1,6 +1,4 @@
-import { TRPCError } from '@trpc/server';
-import { createRouter } from 'server/create-router';
-import { paginationValidator } from 'server/domains/pagination';
+import { paginationSchema } from 'server/domains/pagination';
 import { z } from 'zod';
 import * as posts from '../domains/posts';
 
@@ -9,17 +7,12 @@ export const postsRouter = createRouter()
    * @description Query all posts
    */
   .query('all', {
-    input: paginationValidator,
+    input: paginationSchema,
+    meta: {
+      resourceName: 'post',
+    },
     async resolve({ input: { page, perPage }, ctx }) {
-      try {
-        return await posts.all(ctx, page, perPage);
-      } catch (error) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Something went wrong',
-          cause: error,
-        });
-      }
+      return posts.all(ctx, page, perPage);
     },
   })
 
@@ -30,15 +23,10 @@ export const postsRouter = createRouter()
     input: z.object({
       id: z.string(),
     }),
+    meta: {
+      resourceName: 'post',
+    },
     async resolve({ input: { id }, ctx }) {
-      try {
-        return await posts.byId(ctx, id);
-      } catch (error) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Post not found',
-          cause: error,
-        });
-      }
+      return posts.byId(ctx, id);
     },
   });

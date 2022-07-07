@@ -26,3 +26,7 @@ export async function createContext({ req, res }: ContextArgs) {
 export type Context = inferAsyncReturnType<typeof createContext>;
 export type RequestlessContext = Omit<Context, 'req' | 'res'>;
 export type AuthedUserContext = Omit<Context, 'session'> & { session: Session };
+
+export type Meta = {
+  resourceName?: string;
+};

@@ -9,6 +9,9 @@ export const commentUpvotesRouter = createProtectedRouter()
     input: z.object({
       commentId: z.string(),
     }),
+    meta: {
+      resourceName: 'comment upvote',
+    },
     async resolve({ input, ctx }) {
       return ctx.prisma.commentUpvote.create({
         data: {
@@ -26,6 +29,9 @@ export const commentUpvotesRouter = createProtectedRouter()
     input: z.object({
       commentId: z.string(),
     }),
+    meta: {
+      resourceName: 'comment upvote',
+    },
     async resolve({ input: { commentId }, ctx }) {
       return ctx.prisma.commentUpvote.delete({
         where: {

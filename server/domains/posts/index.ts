@@ -47,7 +47,6 @@ export async function all(ctx: RequestlessContext, page: number, perPage: number
 
 export async function byId(ctx: RequestlessContext, id: string) {
   const post = await ctx.prisma.post.findUnique({
-    rejectOnNotFound: true,
     where: { id },
     include: {
       _count: true,
@@ -68,6 +67,10 @@ export async function byId(ctx: RequestlessContext, id: string) {
       comments: commentWithAuthorAndUserUpvote(ctx.session?.user?.id),
     },
   });
+
+  if (!post) {
+    return null;
+  }
 
   return {
     ...post,

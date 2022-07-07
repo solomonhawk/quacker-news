@@ -9,6 +9,9 @@ export const postUpvotesRouter = createProtectedRouter()
     input: z.object({
       postId: z.string(),
     }),
+    meta: {
+      resourceName: 'post upvote',
+    },
     async resolve({ input, ctx }) {
       return ctx.prisma.postUpvote.create({
         data: { ...input, userId: ctx.session.user.id },
@@ -23,6 +26,9 @@ export const postUpvotesRouter = createProtectedRouter()
     input: z.object({
       postId: z.string(),
     }),
+    meta: {
+      resourceName: 'post upvote',
+    },
     async resolve({ input: { postId }, ctx }) {
       return ctx.prisma.postUpvote.delete({
         where: {

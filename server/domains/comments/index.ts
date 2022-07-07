@@ -19,7 +19,6 @@ export type PostComment = Prisma.CommentGetPayload<ReturnType<typeof commentWith
 export async function byId(ctx: RequestlessContext, id: string) {
   const [comment, comments] = await ctx.prisma.$transaction(async prisma => {
     const comment = await prisma.comment.findUnique({
-      rejectOnNotFound: true,
       where: { id },
       include: {
         author: {
@@ -27,7 +26,6 @@ export async function byId(ctx: RequestlessContext, id: string) {
             username: true,
           },
         },
-        parent: true,
         post: {
           include: {
             author: {
@@ -48,16 +46,22 @@ export async function byId(ctx: RequestlessContext, id: string) {
     // @NOTE: sadge... can't pull back all nested posts easily with the comment
     // query above since replies of replies aren't associated to the comment
     // being queried.
-    const comments = await prisma.comment.findMany({
-      where: { postId: comment.postId },
-      ...commentWithAuthorAndUserUpvote(ctx.session?.user?.id),
-    });
+    const comments = comment
+      ? await prisma.comment.findMany({
+          where: { postId: comment.postId },
+          ...commentWithAuthorAndUserUpvote(ctx.session?.user?.id),
+        })
+      : [];
 
     return [comment, comments] as const;
   });
 
-  return {
-    ...comment,
-    comments: threadComments(comments, comment.id),
-  };
+  if (comment) {
+    return {
+      ...comment,
+      comments: threadComments(comments, comment.id),
+    };
+  }
+
+  return null;
 }

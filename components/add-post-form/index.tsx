@@ -51,6 +51,8 @@ export const AddPostForm = () => {
 
   return (
     <div className="bg-[#f6f6ef] p-4">
+      {addPost.error ? <span className="block text-red-500 mb-2">{addPost.error.message}</span> : null}
+
       <form ref={formRef} onSubmit={handleSubmit}>
         <div className="mb-2">
           <label className="block" htmlFor="title">
@@ -74,8 +76,6 @@ export const AddPostForm = () => {
 
           <input id="url" type="text" name="url" className="border border-gray-700 rounded-sm p-1 w-full max-w-xl" />
         </div>
-
-        {addPost.error ? <span className="block text-red-500 mb-2">{addPost.error.message}</span> : null}
 
         {errors.url ? <span className="block text-red-500 mb-2">{errors.url[0]}</span> : null}
 

@@ -1,5 +1,5 @@
 import { CommentUpvoteButton } from 'components/comment-upvote-button';
-import { AddCommentForm } from 'components/post/add-comment-form';
+import { AddCommentForm } from 'components/add-comment-form';
 import { Comment } from 'components/post/comment';
 import { Timestamp } from 'components/posts-list/timestamp';
 import { InferQueryOutput } from 'helpers/trpc';

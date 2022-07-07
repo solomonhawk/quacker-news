@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import * as comments from '../domains/comments';
 import { createRouter, createProtectedRouter } from 'server/create-router';
-import { commentValidator } from 'server/domains/comments/helpers';
+import { createCommentSchema } from 'server/domains/comments/helpers';
 import * as z from 'zod';
 
 const defaultCommentSelect = Prisma.validator<Prisma.CommentSelect>()({
@@ -37,7 +37,7 @@ export const commentsRouter = createRouter()
        * @description Create comment
        */
       .mutation('create', {
-        input: commentValidator,
+        input: createCommentSchema,
         async resolve({ input, ctx }) {
           return ctx.prisma.comment.create({
             data: { ...input, authorId: ctx.session.user.id },

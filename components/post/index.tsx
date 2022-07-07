@@ -3,7 +3,7 @@ import { Timestamp } from 'components/posts-list/timestamp';
 import { InferQueryOutput } from 'helpers/trpc';
 import { host } from 'helpers/url';
 import Link from 'next/link';
-import { AddCommentForm } from './add-comment-form';
+import { AddCommentForm } from '../add-comment-form';
 import { Comment } from './comment';
 
 type PostQueryById = InferQueryOutput<'post.byId'>;

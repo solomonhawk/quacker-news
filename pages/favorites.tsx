@@ -5,8 +5,8 @@ import { dehydrateQueries } from 'lib/trpc/dehydrate-queries';
 import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
 import Head from 'next/head';
 
-const HiddenPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ page }) => {
-  const postsQuery = trpc.useQuery(['post.hidden', { page }]);
+const FavoritesPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ page }) => {
+  const postsQuery = trpc.useQuery(['post.favorites', { page }]);
 
   return (
     <>
@@ -19,7 +19,7 @@ const HiddenPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps
       <DefaultQueryCell
         query={postsQuery}
         isEmpty={({ data }) => data.totalCount === 0}
-        empty={() => <div className="p-4">You haven’t hidden any posts.</div>}
+        empty={() => <div className="p-4">You haven’t favorited any posts.</div>}
         success={({ data }) => {
           return (
             <PostsList
@@ -36,7 +36,7 @@ const HiddenPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps
 export const getServerSideProps: GetServerSideProps = async ctx => {
   const pageParam = parseInt(ctx.query.page as string, 10);
   const page = isNaN(pageParam) ? 1 : pageParam;
-  return dehydrateQueries(ctx, async ssg => await ssg.fetchQuery('post.hidden', { page }), { page });
+  return dehydrateQueries(ctx, async ssg => await ssg.fetchQuery('post.favorites', { page }), { page });
 };
 
-export default HiddenPage;
+export default FavoritesPage;

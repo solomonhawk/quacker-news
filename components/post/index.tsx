@@ -1,3 +1,4 @@
+import { PostFavoriteButton } from 'components/post-favorite-button';
 import { PostHideButton } from 'components/post-hide-button';
 import { PostUpvoteButton } from 'components/post-upvote-button';
 import { Timestamp } from 'components/posts-list/timestamp';
@@ -42,6 +43,8 @@ export const Post = ({ post }: { post: PostQueryById }) => {
             <Timestamp date={post.createdAt} />
             {' | '}
             <PostHideButton postId={post.id} hidden={post.hidden} />
+            {' | '}
+            <PostFavoriteButton postId={post.id} favorited={post.favorited} />
             {' | '}
             <Link href={`/item?id=${post.id}`}>
               <a className="hover:underline">

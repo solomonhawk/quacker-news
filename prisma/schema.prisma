@@ -51,6 +51,7 @@ model User {
   posts          Post[]
   sessions       Session[]
   hiddenPosts    HiddenPost[]
+  favorite       Favorite[]
 
   @@map("users")
 }
@@ -77,6 +78,7 @@ model Post {
   comments    Comment[]
   upvotes     PostUpvote[]
   hiddenPosts HiddenPost[]
+  favorites   Favorite[]
 
   @@index([type])
   @@map("posts")
@@ -131,6 +133,17 @@ model HiddenPost {
 
   @@unique([userId, postId])
   @@map("user_hidden_posts")
+}
+
+model Favorite {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  postId String @map("post_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("user_favorites")
 }
 
 enum PostType {

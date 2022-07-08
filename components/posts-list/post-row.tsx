@@ -1,3 +1,4 @@
+import { PostFavoriteButton } from 'components/post-favorite-button';
 import { PostHideButton } from 'components/post-hide-button';
 import { PostUpvoteButton } from 'components/post-upvote-button';
 import { ArrayElement, InferQueryOutput } from 'helpers/trpc';
@@ -32,7 +33,12 @@ export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.al
           <Link href={`/user?id=${post.author.username}`}>
             <a className="hover:underline">{post.author.username}</a>
           </Link>{' '}
-          <Timestamp date={post.createdAt} /> | <PostHideButton postId={post.id} hidden={post.hidden} /> |{' '}
+          <Timestamp date={post.createdAt} />
+          {' | '}
+          <PostHideButton postId={post.id} hidden={post.hidden} />
+          {' | '}
+          <PostFavoriteButton postId={post.id} favorited={post.favorited} />
+          {' | '}
           <Link href={`/item?id=${post.id}`}>
             <a className="hover:underline">
               {post._count.comments === 0

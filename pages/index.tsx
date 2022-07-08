@@ -19,7 +19,7 @@ const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>
       <DefaultQueryCell
         query={postsQuery}
         isEmpty={({ data }) => data.totalCount === 0}
-        empty={() => <div>There are no posts yet - go ahead and add one!</div>}
+        empty={() => <div className="p-4">There are no posts yet - go ahead and add one!</div>}
         success={({ data }) => {
           return (
             <PostsList

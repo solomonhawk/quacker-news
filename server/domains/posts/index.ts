@@ -47,6 +47,12 @@ export async function all(ctx: Requestless<Context>, page: number, perPage: numb
             username: true,
           },
         },
+        favorites: {
+          take: ctx.session?.user?.id ? 1 : 0,
+          where: {
+            userId: ctx.session?.user?.id,
+          },
+        },
         hiddenPosts: {
           take: ctx.session?.user?.id ? 1 : 0,
           where: {
@@ -65,6 +71,7 @@ export async function all(ctx: Requestless<Context>, page: number, perPage: numb
     posts: posts.map((post, i) => {
       return {
         ...post,
+        favorited: ctx.session?.user?.id ? post.favorites.length > 0 : false,
         hidden: ctx.session?.user?.id ? post.hiddenPosts.length > 0 : false,
         upvoted: ctx.session?.user?.id ? post.upvotes.length > 0 : false,
         position: skip + i + 1,
@@ -93,6 +100,12 @@ export async function byId(ctx: Requestless<Context>, id: string) {
           username: true,
         },
       },
+      favorites: {
+        take: ctx.session?.user?.id ? 1 : 0,
+        where: {
+          userId: ctx.session?.user?.id,
+        },
+      },
       hiddenPosts: {
         take: ctx.session?.user?.id ? 1 : 0,
         where: {
@@ -109,6 +122,7 @@ export async function byId(ctx: Requestless<Context>, id: string) {
 
   return {
     ...post,
+    favorited: ctx.session?.user?.id ? post.favorites.length > 0 : false,
     hidden: ctx.session?.user?.id ? post.hiddenPosts.length > 0 : false,
     upvoted: ctx.session?.user?.id ? post.upvotes.length > 0 : false,
     comments: threadComments(post.comments).map(comment => {
@@ -164,6 +178,12 @@ export async function hidden(ctx: Requestless<Context>, page: number, perPage: n
             username: true,
           },
         },
+        favorites: {
+          take: ctx.session?.user?.id ? 1 : 0,
+          where: {
+            userId: ctx.session?.user?.id,
+          },
+        },
         hiddenPosts: {
           take: ctx.session?.user?.id ? 1 : 0,
           where: {
@@ -182,6 +202,80 @@ export async function hidden(ctx: Requestless<Context>, page: number, perPage: n
     posts: posts.map((post, i) => {
       return {
         ...post,
+        favorited: ctx.session?.user?.id ? post.favorites.length > 0 : false,
+        hidden: ctx.session?.user?.id ? post.hiddenPosts.length > 0 : false,
+        upvoted: ctx.session?.user?.id ? post.upvotes.length > 0 : false,
+        position: skip + i + 1,
+      };
+    }),
+  };
+}
+
+export async function favorites(ctx: Requestless<Context>, page: number, perPage: number) {
+  const skip = (page - 1) * perPage;
+
+  const [totalCount, posts] = await ctx.prisma.$transaction([
+    ctx.prisma.post.count({
+      where: {
+        favorites: {
+          some: {
+            userId: ctx.session?.user?.id,
+          },
+        },
+      },
+    }),
+    ctx.prisma.post.findMany({
+      skip,
+      take: perPage,
+      where: {
+        favorites: {
+          some: {
+            userId: ctx.session?.user?.id,
+          },
+        },
+      },
+      include: {
+        _count: true,
+        upvotes: {
+          take: ctx.session?.user?.id ? 1 : 0,
+          where: {
+            userId: ctx.session?.user?.id,
+          },
+          select: {
+            id: true,
+          },
+        },
+        author: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        favorites: {
+          take: ctx.session?.user?.id ? 1 : 0,
+          where: {
+            userId: ctx.session?.user?.id,
+          },
+        },
+        hiddenPosts: {
+          take: ctx.session?.user?.id ? 1 : 0,
+          where: {
+            userId: ctx.session?.user?.id,
+          },
+        },
+      },
+    }),
+  ]);
+
+  return {
+    page,
+    perPage,
+    totalCount,
+    totalPages: Math.ceil(totalCount / perPage),
+    posts: posts.map((post, i) => {
+      return {
+        ...post,
+        favorited: ctx.session?.user?.id ? post.favorites.length > 0 : false,
         hidden: ctx.session?.user?.id ? post.hiddenPosts.length > 0 : false,
         upvoted: ctx.session?.user?.id ? post.upvotes.length > 0 : false,
         position: skip + i + 1,
@@ -204,6 +298,23 @@ export const hide = async (ctx: Requestless<AuthedContext>, id: string) => {
 
 export const unhide = async (ctx: Requestless<AuthedContext>, postId: string) => {
   return ctx.prisma.hiddenPost.delete({
+    where: {
+      userId_postId: {
+        postId,
+        userId: ctx.session.user.id,
+      },
+    },
+  });
+};
+
+export const favorite = async (ctx: Requestless<AuthedContext>, id: string) => {
+  return ctx.prisma.favorite.create({
+    data: { postId: id, userId: ctx.session.user.id },
+  });
+};
+
+export const unfavorite = async (ctx: Requestless<AuthedContext>, postId: string) => {
+  return ctx.prisma.favorite.delete({
     where: {
       userId_postId: {
         postId,

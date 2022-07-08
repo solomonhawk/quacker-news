@@ -36,7 +36,7 @@ export const postsRouter = createRouter()
   .merge(
     createProtectedRouter()
       /**
-       * @description Query all posts
+       * @description Query user's hidden posts
        */
       .query('hidden', {
         input: paginationSchema.default({}),
@@ -44,6 +44,17 @@ export const postsRouter = createRouter()
           resourceName: 'post',
         },
         resolve: async ({ input: { page, perPage }, ctx }) => posts.hidden(ctx, page, perPage),
+      })
+
+      /**
+       * @description Query user's favorite posts
+       */
+      .query('favorites', {
+        input: paginationSchema.default({}),
+        meta: {
+          resourceName: 'post',
+        },
+        resolve: async ({ input: { page, perPage }, ctx }) => posts.favorites(ctx, page, perPage),
       })
 
       /**
@@ -81,5 +92,31 @@ export const postsRouter = createRouter()
           resourceName: 'post',
         },
         resolve: async ({ input: { id }, ctx }) => posts.unhide(ctx, id),
+      })
+
+      /**
+       * @description Favorite a post
+       */
+      .mutation('favorite', {
+        input: z.object({
+          id: z.string(),
+        }),
+        meta: {
+          resourceName: 'post',
+        },
+        resolve: async ({ input: { id }, ctx }) => posts.favorite(ctx, id),
+      })
+
+      /**
+       * @description Unfavorite a post
+       */
+      .mutation('unfavorite', {
+        input: z.object({
+          id: z.string(),
+        }),
+        meta: {
+          resourceName: 'post',
+        },
+        resolve: async ({ input: { id }, ctx }) => posts.unfavorite(ctx, id),
       }),
   );

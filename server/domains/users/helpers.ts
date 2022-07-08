@@ -17,6 +17,7 @@ export const userSelectPublicProfile = Prisma.validator<Prisma.UserSelect>()({
   id: true,
   username: true,
   createdAt: true,
+  _count: true,
 });
 
 export const userSelectAuthedProfile = Prisma.validator<Prisma.UserSelect>()({
@@ -24,4 +25,5 @@ export const userSelectAuthedProfile = Prisma.validator<Prisma.UserSelect>()({
   email: true,
   username: true,
   createdAt: true,
+  _count: true,
 });

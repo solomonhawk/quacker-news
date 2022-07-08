@@ -60,6 +60,8 @@ export const AppHeader = () => {
 
           <UserKarma />
 
+          {' | '}
+
           <Link href="/api/auth/signout">
             <a
               className="px-1"
@@ -68,7 +70,7 @@ export const AppHeader = () => {
                 signOut({ redirect: false });
               }}
             >
-              sign out
+              logout
             </a>
           </Link>
         </div>

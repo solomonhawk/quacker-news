@@ -18,7 +18,9 @@ export const PostUpvoteButton = ({
       // isn't great - can we do better? react-query does not have built-in
       // support for a normalized cache so we'd have to get clever and build
       // something on top
-      utils.invalidateQueries(['post.all']);
+      utils.invalidateQueries('post.all');
+      utils.invalidateQueries('post.hidden');
+      utils.invalidateQueries('post.favorites');
       utils.invalidateQueries(['post.byId', { id: postId }]);
     },
   });

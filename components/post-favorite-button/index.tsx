@@ -6,6 +6,7 @@ export const PostFavoriteButton = ({ postId, favorited }: { postId: string; favo
   const toggleFavorite = trpc.useMutation(favorited ? 'post.unfavorite' : 'post.favorite', {
     onSuccess: () => {
       utils.invalidateQueries('post.all');
+      utils.invalidateQueries('post.hidden');
       utils.invalidateQueries('post.favorites');
       utils.invalidateQueries(['post.byId', { id: postId }]);
     },

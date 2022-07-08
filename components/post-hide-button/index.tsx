@@ -7,6 +7,7 @@ export const PostHideButton = ({ postId, hidden }: { postId: string; hidden: boo
     onSuccess: () => {
       utils.invalidateQueries('post.all');
       utils.invalidateQueries('post.hidden');
+      utils.invalidateQueries('post.favorites');
       utils.invalidateQueries(['post.byId', { id: postId }]);
     },
   });

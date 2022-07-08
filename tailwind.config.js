@@ -5,5 +5,4 @@ module.exports = {
     extend: {},
   },
   plugins: [],
-  safelist: ['bg-yellow-200', 'not-italic']
 };

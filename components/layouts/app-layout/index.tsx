@@ -6,7 +6,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <main className="sm:p-2">
-        <div className="sm:container mx-auto sm:px-4">
+        <div className="sm:container mx-auto sm:px-4 bg-[#f6f6ef]">
           <AppHeader />
           {children}
           <AppFooter />

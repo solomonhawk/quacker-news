@@ -36,7 +36,7 @@ export const usersRouter = createRouter()
       resourceName: 'user',
     },
     async resolve({ input: { email, username, password }, ctx }) {
-      return await ctx.prisma.user.create({
+      return ctx.prisma.user.create({
         data: {
           email,
           username,
@@ -56,7 +56,7 @@ export const usersRouter = createRouter()
         resourceName: 'user',
       },
       async resolve({ ctx }) {
-        return await users.karma(ctx);
+        return users.karma(ctx);
       },
     }),
   );

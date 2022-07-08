@@ -1,22 +1,24 @@
 import { ErrorLayout } from 'components/layouts/error-layout';
 import { NextPage } from 'next';
 import Head from 'next/head';
+import React from 'react';
 
-const NotFound: NextPage = () => {
+const InternalServerError: NextPage<{ children?: React.ReactNode }> = ({ children }) => {
   return (
     <>
       <Head>
-        <title>QuackerNews - Page Not Found</title>
+        <title>QuackerNews - Sorry, it broke!</title>
         <meta name="robots" content="noindex" />
       </Head>
 
       <ErrorLayout>
         <div className="p-2">
-          <h1>Page Not Found</h1>
+          <h1>Internal Server Error</h1>
+          {children}
         </div>
       </ErrorLayout>
     </>
   );
 };
 
-export default NotFound;
+export default InternalServerError;

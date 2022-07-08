@@ -19,7 +19,7 @@ export const PostFavoriteButton = ({ postId, favorited }: { postId: string; favo
 
   return (
     <button disabled={toggleFavorite.isLoading} className="hover:underline" onClick={hide}>
-      {favorited ? 'un-favorite' : 'save'}
+      {favorited ? 'un-favorite' : 'favorite'}
     </button>
   );
 };

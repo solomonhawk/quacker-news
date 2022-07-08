@@ -9,7 +9,9 @@ const NotFound: NextPage = () => {
         <meta name="robots" content="noindex" />
       </Head>
 
-      <h1>Page Not Found</h1>
+      <div className="p-4">
+        <h1>Page Not Found</h1>
+      </div>
     </>
   );
 };

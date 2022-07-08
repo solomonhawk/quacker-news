@@ -32,7 +32,22 @@ export const AppFooter = () => {
           );
         })}
       </nav>
+
       <SearchForm />
+
+      <em className="text-xs mt-4 opacity-40 text-center">
+        Logo and styling belong to{' '}
+        <a
+          className="hover:underline"
+          href="https://news.ycombinator.com"
+          rel="nofollow noopener noreferrer"
+          target="_blank"
+        >
+          https://news.ycombinator.com
+        </a>
+        <br />
+        and are reproduced here with love and respect.
+      </em>
     </footer>
   );
 };

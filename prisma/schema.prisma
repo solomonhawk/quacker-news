@@ -43,12 +43,14 @@ model User {
   emailVerified  DateTime?
   username       String          @unique
   passwordHash   String          @map("password_hash")
+  createdAt      DateTime        @default(now()) @map("created_at")
   accounts       Account[]
   commentUpvotes CommentUpvote[]
   comments       Comment[]
   postUpvotes    PostUpvote[]
   posts          Post[]
   sessions       Session[]
+  hiddenPosts    HiddenPost[]
 
   @@map("users")
 }
@@ -63,17 +65,20 @@ model VerificationToken {
 }
 
 model Post {
-  id        String       @id @default(uuid())
-  type      PostType     @default(DISCUSSION)
+  id        String   @id @default(uuid())
+  type      PostType @default(DISCUSSION)
   title     String?
   content   String?
-  url       String?      @unique
-  authorId  String       @map("author_id")
-  createdAt DateTime     @default(now()) @map("created_at")
-  author    User         @relation(fields: [authorId], references: [id])
-  comments  Comment[]
-  upvotes   PostUpvote[]
+  url       String?  @unique
+  authorId  String   @map("author_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  author    User     @relation(fields: [authorId], references: [id])
 
+  comments    Comment[]
+  upvotes     PostUpvote[]
+  hiddenPosts HiddenPost[]
+
+  @@index([type])
   @@map("posts")
 }
 
@@ -115,6 +120,17 @@ model CommentUpvote {
 
   @@unique([commentId, userId])
   @@map("comment_upvotes")
+}
+
+model HiddenPost {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  postId String @map("post_id")
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("user_hidden_posts")
 }
 
 enum PostType {

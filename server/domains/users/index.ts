@@ -1,21 +1,21 @@
 import bcrypt from 'bcryptjs';
 import { Context, Requestless } from 'server/context';
 import { z } from 'zod';
-import { createUserSchema, defaultUserSelect } from './helpers';
+import { createUserSchema, defaultUserSelect, userSelectAuthedProfile, userSelectPublicProfile } from './helpers';
 
-export const karma = async (ctx: Requestless<Context>) => {
+export const karma = async (ctx: Requestless<Context>, username: string) => {
   const [postUpvoteCount, commentUpvoteCount] = await ctx.prisma.$transaction([
     ctx.prisma.postUpvote.count({
       where: {
         post: {
-          authorId: ctx.session?.user?.id,
+          author: { username },
         },
       },
     }),
     ctx.prisma.commentUpvote.count({
       where: {
         comment: {
-          authorId: ctx.session?.user?.id,
+          author: { username },
         },
       },
     }),
@@ -24,15 +24,34 @@ export const karma = async (ctx: Requestless<Context>) => {
   return postUpvoteCount + commentUpvoteCount;
 };
 
-export const byId = async (ctx: Requestless<Context>, id: string) => {
-  return ctx.prisma.user.findUniqueOrThrow({
-    where: { id },
-    select: defaultUserSelect,
+export const byUsernamePublic = async (ctx: Requestless<Context>, username: string) => {
+  const user = await ctx.prisma.user.findUnique({
+    select: userSelectPublicProfile,
+    where: {
+      username,
+    },
   });
+
+  if (!user) {
+    return null;
+  }
+
+  return { ...user, karma: await karma(ctx, username) };
 };
 
-export const byUsername = async (ctx: Requestless<Context>, username: string) => {
-  return await ctx.prisma.user.findUnique({
+export const byUsernamePrivate = async (ctx: Requestless<Context>, username: string) => {
+  const user = await ctx.prisma.user.findUniqueOrThrow({
+    select: userSelectAuthedProfile,
+    where: {
+      username,
+    },
+  });
+
+  return { ...user, karma: await karma(ctx, username) };
+};
+
+export const byUsernameForAuth = async (ctx: Requestless<Context>, username: string) => {
+  return ctx.prisma.user.findUniqueOrThrow({
     where: {
       username,
     },

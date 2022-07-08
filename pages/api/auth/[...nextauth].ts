@@ -47,7 +47,7 @@ export default NextAuth({
           throw new Error('Invalid request');
         }
 
-        const user = await users.byUsername({ session: null, prisma }, credentials.username);
+        const user = await users.byUsernameForAuth({ session: null, prisma }, credentials.username);
 
         if (!user) {
           await prisma.$disconnect();
@@ -59,7 +59,10 @@ export default NextAuth({
           throw new Error('Login failed');
         }
 
-        const karma = await users.karma({ session: { expires: '0', user: { ...user, karma: 0 } }, prisma });
+        const karma = await users.karma(
+          { session: { expires: '0', user: { ...user, karma: 0 } }, prisma },
+          user.username,
+        );
 
         return { id: user.id, email: user.email, username: user.username, karma };
       },

@@ -5,16 +5,16 @@ import { z } from 'zod';
 
 export const usersRouter = createRouter()
   /**
-   * @description Query user by ID
+   * @description Query public user by ID
    */
-  .query('byId', {
+  .query('byUsername.public', {
     input: z.object({
-      id: z.string(),
+      username: z.string(),
     }),
     meta: {
       resourceName: 'user',
     },
-    resolve: async ({ input: { id }, ctx }) => users.byId(ctx, id),
+    resolve: async ({ input: { username }, ctx }) => users.byUsernamePublic(ctx, username),
   })
 
   /**
@@ -34,11 +34,27 @@ export const usersRouter = createRouter()
        * @description Get the current user's karma count
        */
       .query('karma', {
+        input: z.object({
+          username: z.string(),
+        }),
         meta: {
           resourceName: 'user',
         },
-        async resolve({ ctx }) {
-          return users.karma(ctx);
+        async resolve({ input: { username }, ctx }) {
+          return users.karma(ctx, username);
         },
+      })
+
+      /**
+       * @description Query user by ID
+       */
+      .query('byUsername.private', {
+        input: z.object({
+          username: z.string(),
+        }),
+        meta: {
+          resourceName: 'user',
+        },
+        resolve: async ({ input: { username }, ctx }) => users.byUsernamePrivate(ctx, username),
       }),
   );

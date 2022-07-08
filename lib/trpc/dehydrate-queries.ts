@@ -1,6 +1,7 @@
 import { createSSGHelpers } from '@trpc/react/ssg';
 import { ServerSideDataProps } from 'helpers/trpc';
 import { GetServerSidePropsContext } from 'next';
+import { Session } from 'next-auth';
 import { createContext } from 'server/context';
 import { appRouter, AppRouter } from 'server/router';
 import superjson from 'superjson';
@@ -17,7 +18,7 @@ import superjson from 'superjson';
  */
 export const dehydrateQueries = async <T extends Record<string, unknown>>(
   ctx: GetServerSidePropsContext,
-  fetchData: (ssg: ReturnType<typeof createSSGHelpers<AppRouter>>) => Promise<unknown>,
+  fetchData: (ssg: ReturnType<typeof createSSGHelpers<AppRouter>>, session: Session | null) => Promise<unknown>,
   includeProps: T = {} as T,
 ): Promise<{ props: ServerSideDataProps<T> }> => {
   const trpcContext = await createContext({ req: ctx.req, res: ctx.res });
@@ -28,7 +29,7 @@ export const dehydrateQueries = async <T extends Record<string, unknown>>(
     transformer: superjson,
   });
 
-  await fetchData(ssg);
+  await fetchData(ssg, trpcContext.session);
 
   return {
     props: {

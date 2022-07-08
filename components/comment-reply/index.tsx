@@ -31,7 +31,7 @@ export const CommentReply = ({ comment }: Props) => {
               </a>
             </Link>
             {' | '}
-            <Link href={comment.parentId ? `/reply?id=${comment.parentId}` : `/item?id=${comment.postId}`}>
+            <Link href={comment.parentId ? `/comment?id=${comment.parentId}` : `/item?id=${comment.postId}`}>
               <a className="hover:underline">parent</a>
             </Link>{' '}
             {' | '}

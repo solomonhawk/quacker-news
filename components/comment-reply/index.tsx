@@ -53,7 +53,7 @@ export const CommentReply = ({ comment }: Props) => {
         </div>
       </div>
 
-      <div className="mb-8 ml-5">
+      <div className="mb-6 ml-5">
         <AddCommentForm postId={comment.postId} parentId={comment.id} submitButtonText="reply" />
       </div>
     </div>

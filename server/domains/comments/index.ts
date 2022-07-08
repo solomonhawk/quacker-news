@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { AuthedContext, Context, Requestless } from 'server/context';
 import { z } from 'zod';
+import { selectOneForCurrentUser } from '../helpers/filters';
 import { createCommentSchema, defaultCommentSelect, threadComments } from './helpers';
 
 export type PostComment = Prisma.CommentGetPayload<ReturnType<typeof commentWithAuthorAndUserUpvote>>;
@@ -11,7 +12,7 @@ export const commentWithAuthorAndUserUpvote = (userId?: string) => {
       createdAt: 'desc',
     },
     include: {
-      upvotes: { take: userId ? 1 : 0, where: { userId } },
+      upvotes: selectOneForCurrentUser(userId),
       author: { select: { username: true } },
     },
   });

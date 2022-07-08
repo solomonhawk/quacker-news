@@ -3,6 +3,7 @@ import { AuthedContext, Context, Requestless } from 'server/context';
 import { z } from 'zod';
 import { commentWithAuthorAndUserUpvote } from '../comments';
 import { threadComments } from '../comments/helpers';
+import { selectOneForCurrentUser } from '../helpers/filters';
 import { createPostSchema, derivePostType } from './helpers';
 
 type Pagination = {
@@ -15,7 +16,7 @@ type PaginatedPostsQueryParams = {
   prisma: PrismaClient;
   pagination: Pagination;
   where?: Prisma.PostWhereInput;
-  orderBy?: Prisma.PostOrderByWithRelationInput;
+  orderBy?: Prisma.PostOrderByWithRelationAndSearchRelevanceInput;
   userId?: string;
 };
 
@@ -35,39 +36,15 @@ const queryPaginatedPosts = async ({
       orderBy,
       include: {
         _count: true,
-        upvotes: {
-          take: userId ? 1 : 0,
-          where: {
-            userId,
-          },
-          select: {
-            id: true,
-          },
-        },
         author: {
           select: {
             id: true,
             username: true,
           },
         },
-        favorites: {
-          take: userId ? 1 : 0,
-          where: {
-            userId,
-          },
-          select: {
-            id: true,
-          },
-        },
-        hiddenPosts: {
-          take: userId ? 1 : 0,
-          where: {
-            userId,
-          },
-          select: {
-            id: true,
-          },
-        },
+        upvotes: selectOneForCurrentUser(userId),
+        favorites: selectOneForCurrentUser(userId),
+        hiddenPosts: selectOneForCurrentUser(userId),
       },
     }),
   ]);
@@ -107,7 +84,7 @@ export async function all(ctx: Requestless<Context>, page: number, perPage: numb
 
   const orderBy = {
     upvotes: {
-      _count: 'desc' as const,
+      _count: Prisma.SortOrder.desc,
     },
   };
 
@@ -119,33 +96,15 @@ export async function byId(ctx: Requestless<Context>, id: string) {
     where: { id },
     include: {
       _count: true,
-      upvotes: {
-        take: ctx.session?.user?.id ? 1 : 0,
-        where: {
-          userId: ctx.session?.user?.id,
-        },
-        select: {
-          id: true,
-        },
-      },
       author: {
         select: {
           id: true,
           username: true,
         },
       },
-      favorites: {
-        take: ctx.session?.user?.id ? 1 : 0,
-        where: {
-          userId: ctx.session?.user?.id,
-        },
-      },
-      hiddenPosts: {
-        take: ctx.session?.user?.id ? 1 : 0,
-        where: {
-          userId: ctx.session?.user?.id,
-        },
-      },
+      upvotes: selectOneForCurrentUser(ctx.session?.user?.id),
+      favorites: selectOneForCurrentUser(ctx.session?.user?.id),
+      hiddenPosts: selectOneForCurrentUser(ctx.session?.user?.id),
       comments: commentWithAuthorAndUserUpvote(ctx.session?.user?.id),
     },
   });

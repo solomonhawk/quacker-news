@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { commentWithAuthorAndUserUpvote } from '../comments';
 import { threadComments } from '../comments/helpers';
 import { selectOneForCurrentUser } from '../helpers/filters';
+import { highlightSearchTerm, OrderType } from '../search/helpers';
 import { createPostSchema, derivePostType } from './helpers';
 
 type Pagination = {
@@ -18,6 +19,7 @@ type PaginatedPostsQueryParams = {
   where?: Prisma.PostWhereInput;
   orderBy?: Prisma.PostOrderByWithRelationAndSearchRelevanceInput;
   userId?: string;
+  query?: string;
 };
 
 const queryPaginatedPosts = async ({
@@ -26,6 +28,7 @@ const queryPaginatedPosts = async ({
   where,
   orderBy,
   userId,
+  query,
 }: PaginatedPostsQueryParams) => {
   const [totalCount, posts] = await prisma.$transaction([
     prisma.post.count({ where }),
@@ -57,6 +60,8 @@ const queryPaginatedPosts = async ({
     posts: posts.map((post, i) => {
       return {
         ...post,
+        title: highlightSearchTerm(post.title, query),
+        content: post.content ? highlightSearchTerm(post.content, query) : null,
         favorited: userId ? post.favorites.length > 0 : false,
         hidden: userId ? post.hiddenPosts.length > 0 : false,
         upvoted: userId ? post.upvotes.length > 0 : false,
@@ -89,6 +94,36 @@ export async function all(ctx: Requestless<Context>, page: number, perPage: numb
   };
 
   return queryPaginatedPosts({ prisma: ctx.prisma, pagination, where, orderBy, userId: ctx.session?.user.id });
+}
+
+export async function search(
+  ctx: Requestless<Context>,
+  page: number,
+  perPage: number,
+  order: OrderType,
+  query?: string,
+) {
+  const pagination = {
+    page,
+    skip: (page - 1) * perPage,
+    perPage,
+  };
+
+  const where: Prisma.PostWhereInput | undefined = query
+    ? {
+        OR: [
+          { title: { search: query, mode: 'insensitive' } },
+          { title: { contains: query, mode: 'insensitive' } },
+          { content: { search: query, mode: 'insensitive' } },
+          { content: { contains: query, mode: 'insensitive' } },
+        ],
+      }
+    : undefined;
+
+  const orderBy =
+    order === OrderType.DATE ? { createdAt: Prisma.SortOrder.desc } : { upvotes: { _count: Prisma.SortOrder.desc } };
+
+  return queryPaginatedPosts({ prisma: ctx.prisma, pagination, where, orderBy, userId: ctx.session?.user.id, query });
 }
 
 export async function byId(ctx: Requestless<Context>, id: string) {

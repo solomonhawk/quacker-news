@@ -17,7 +17,9 @@ export const postsRouter = createRouter()
     meta: {
       resourceName: 'post',
     },
-    resolve: async ({ input: { page, perPage, type }, ctx }) => posts.all(ctx, page, perPage, type),
+    async resolve({ input: { page, perPage, type }, ctx }) {
+      return posts.all(ctx, page, perPage, type);
+    },
   })
 
   /**
@@ -30,7 +32,9 @@ export const postsRouter = createRouter()
     meta: {
       resourceName: 'post',
     },
-    resolve: async ({ input: { id }, ctx }) => posts.byId(ctx, id),
+    async resolve({ input: { id }, ctx }) {
+      return posts.byId(ctx, id);
+    },
   })
 
   .merge(
@@ -43,7 +47,9 @@ export const postsRouter = createRouter()
         meta: {
           resourceName: 'post',
         },
-        resolve: async ({ input: { page, perPage }, ctx }) => posts.hidden(ctx, page, perPage),
+        async resolve({ input: { page, perPage }, ctx }) {
+          return posts.hidden(ctx, page, perPage);
+        },
       })
 
       /**
@@ -54,7 +60,9 @@ export const postsRouter = createRouter()
         meta: {
           resourceName: 'post',
         },
-        resolve: async ({ input: { page, perPage }, ctx }) => posts.favorites(ctx, page, perPage),
+        async resolve({ input: { page, perPage }, ctx }) {
+          return posts.favorites(ctx, page, perPage);
+        },
       })
 
       /**
@@ -65,7 +73,9 @@ export const postsRouter = createRouter()
         meta: {
           resourceName: 'post',
         },
-        resolve: async ({ input, ctx }) => posts.create(ctx, input),
+        async resolve({ input, ctx }) {
+          return posts.create(ctx, input);
+        },
       })
 
       /**
@@ -78,7 +88,9 @@ export const postsRouter = createRouter()
         meta: {
           resourceName: 'post',
         },
-        resolve: async ({ input: { id }, ctx }) => posts.hide(ctx, id),
+        async resolve({ input: { id }, ctx }) {
+          return posts.hide(ctx, id);
+        },
       })
 
       /**
@@ -91,7 +103,9 @@ export const postsRouter = createRouter()
         meta: {
           resourceName: 'post',
         },
-        resolve: async ({ input: { id }, ctx }) => posts.unhide(ctx, id),
+        async resolve({ input: { id }, ctx }) {
+          return posts.unhide(ctx, id);
+        },
       })
 
       /**
@@ -104,7 +118,9 @@ export const postsRouter = createRouter()
         meta: {
           resourceName: 'post',
         },
-        resolve: async ({ input: { id }, ctx }) => posts.favorite(ctx, id),
+        async resolve({ input: { id }, ctx }) {
+          return posts.favorite(ctx, id);
+        },
       })
 
       /**
@@ -117,6 +133,8 @@ export const postsRouter = createRouter()
         meta: {
           resourceName: 'post',
         },
-        resolve: async ({ input: { id }, ctx }) => posts.unfavorite(ctx, id),
+        async resolve({ input: { id }, ctx }) {
+          return posts.unfavorite(ctx, id);
+        },
       }),
   );

@@ -1,5 +1,5 @@
 import { CommentUpvoteButton } from 'components/comment-upvote-button';
-import { Timestamp } from 'components/posts-list/timestamp';
+import { Timestamp } from 'components/timestamp';
 import { useLocalStorageState } from 'helpers/hooks/use-localstorage-state';
 import Link from 'next/link';
 import { PostCommentWithChildren } from 'server/domains/comments/helpers';

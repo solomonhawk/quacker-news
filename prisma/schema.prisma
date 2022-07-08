@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = ["interactiveTransactions", "fullTextSearch"]
 }
 
 datasource db {
@@ -68,7 +68,7 @@ model VerificationToken {
 model Post {
   id        String   @id @default(uuid())
   type      PostType @default(DISCUSSION)
-  title     String?
+  title     String
   content   String?
   url       String?  @unique
   authorId  String   @map("author_id")

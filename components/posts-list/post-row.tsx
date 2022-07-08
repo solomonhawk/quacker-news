@@ -4,7 +4,7 @@ import { PostUpvoteButton } from 'components/post-upvote-button';
 import { ArrayElement, InferQueryOutput } from 'helpers/trpc';
 import { host } from 'helpers/url';
 import Link from 'next/link';
-import { Timestamp } from './timestamp';
+import { Timestamp } from '../timestamp';
 
 export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.all'>['posts']> }) => {
   return (
@@ -17,7 +17,7 @@ export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.al
         <div className="flex items-center">
           <Link href={post.url ?? `/item?id=${post.id}`}>
             <a className="text-lg">
-              <h2 className="leading-tight">{post.title}</h2>
+              <h2 className="leading-tight" dangerouslySetInnerHTML={{ __html: post.title }} />
             </a>
           </Link>
 

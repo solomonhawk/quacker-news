@@ -73,6 +73,7 @@ export default withTRPC<AppRouter>({
         defaultOptions: {
           queries: {
             useErrorBoundary: true,
+            staleTime: 15 * 1000,
           },
           mutations: {
             useErrorBoundary: true,

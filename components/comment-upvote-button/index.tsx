@@ -1,5 +1,6 @@
 import { trpc } from 'lib/trpc';
 import cx from 'classnames';
+import { SearchType } from 'server/domains/search/helpers';
 
 export const CommentUpvoteButton = ({
   postId,
@@ -22,6 +23,7 @@ export const CommentUpvoteButton = ({
       // including re-fetching all comments, which is unnecessary
       utils.invalidateQueries(['post.byId', { id: postId }]);
       utils.invalidateQueries(['comment.byId', { id: commentId }]);
+      utils.invalidateQueries(['search.query', { type: SearchType.COMMENT }]);
     },
   });
 

@@ -1,5 +1,6 @@
-import { trpc } from 'lib/trpc';
 import cx from 'classnames';
+import { trpc } from 'lib/trpc';
+import { SearchType } from 'server/domains/search/helpers';
 
 export const PostUpvoteButton = ({
   postId,
@@ -21,6 +22,7 @@ export const PostUpvoteButton = ({
       utils.invalidateQueries('post.all');
       utils.invalidateQueries('post.hidden');
       utils.invalidateQueries('post.favorites');
+      utils.invalidateQueries(['search.query', { type: SearchType.POST }]);
       utils.invalidateQueries(['post.byId', { id: postId }]);
     },
   });

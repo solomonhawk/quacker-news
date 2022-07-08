@@ -21,6 +21,7 @@ export const CommentUpvoteButton = ({
       // @TODO(shawk) @PERF: this causes the entire post query to be re-executed
       // including re-fetching all comments, which is unnecessary
       utils.invalidateQueries(['post.byId', { id: postId }]);
+      utils.invalidateQueries(['comment.byId', { id: commentId }]);
     },
   });
 

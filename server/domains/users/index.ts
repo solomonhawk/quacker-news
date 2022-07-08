@@ -1,13 +1,9 @@
-import { Prisma } from '@prisma/client';
-import { RequestlessContext } from 'server/context';
+import bcrypt from 'bcryptjs';
+import { Context, Requestless } from 'server/context';
+import { z } from 'zod';
+import { createUserSchema, defaultUserSelect } from './helpers';
 
-export const defaultUserSelect = Prisma.validator<Prisma.UserSelect>()({
-  id: true,
-  email: true,
-  username: true,
-});
-
-export const karma = async (ctx: RequestlessContext) => {
+export const karma = async (ctx: Requestless<Context>) => {
   const [postUpvoteCount, commentUpvoteCount] = await ctx.prisma.$transaction([
     ctx.prisma.postUpvote.count({
       where: {
@@ -28,10 +24,28 @@ export const karma = async (ctx: RequestlessContext) => {
   return postUpvoteCount + commentUpvoteCount;
 };
 
-export const byUsername = async (ctx: RequestlessContext, username: string) => {
+export const byId = async (ctx: Requestless<Context>, id: string) => {
+  return ctx.prisma.user.findUniqueOrThrow({
+    where: { id },
+    select: defaultUserSelect,
+  });
+};
+
+export const byUsername = async (ctx: Requestless<Context>, username: string) => {
   return await ctx.prisma.user.findUnique({
     where: {
       username,
+    },
+  });
+};
+
+export const create = async (ctx: Context, { email, username, password }: z.infer<typeof createUserSchema>) => {
+  return ctx.prisma.user.create({
+    select: defaultUserSelect,
+    data: {
+      email,
+      username,
+      passwordHash: await bcrypt.hash(password, 10),
     },
   });
 };

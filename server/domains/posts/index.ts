@@ -13,6 +13,7 @@ export async function all(ctx: RequestlessContext, page: number, perPage: number
       include: {
         _count: true,
         upvotes: {
+          take: ctx.session?.user?.id ? 1 : 0,
           where: {
             userId: ctx.session?.user?.id,
           },
@@ -45,12 +46,13 @@ export async function all(ctx: RequestlessContext, page: number, perPage: number
   };
 }
 
-export async function byId(ctx: RequestlessContext, id: string) {
+export async function byId(ctx: Requestless<Context>, id: string) {
   const post = await ctx.prisma.post.findUnique({
     where: { id },
     include: {
       _count: true,
       upvotes: {
+        take: ctx.session?.user?.id ? 1 : 0,
         where: {
           userId: ctx.session?.user?.id,
         },
@@ -75,6 +77,15 @@ export async function byId(ctx: RequestlessContext, id: string) {
   return {
     ...post,
     upvoted: ctx.session?.user?.id ? post.upvotes.length > 0 : false,
-    comments: threadComments(post.comments),
+    comments: threadComments(post.comments).map(comment => {
+      if (ctx.session?.user?.id) {
+        return {
+          ...comment,
+          upvoted: comment.upvotes.length > 0,
+        };
+      }
+
+      return comment;
+    }),
   };
 }

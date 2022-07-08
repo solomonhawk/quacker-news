@@ -1,6 +1,9 @@
 import { Prisma } from '@prisma/client';
-import { RequestlessContext } from 'server/context';
-import { threadComments } from './helpers';
+import { AuthedContext, Context, Requestless } from 'server/context';
+import { z } from 'zod';
+import { createCommentSchema, defaultCommentSelect, threadComments } from './helpers';
+
+export type PostComment = Prisma.CommentGetPayload<ReturnType<typeof commentWithAuthorAndUserUpvote>>;
 
 export const commentWithAuthorAndUserUpvote = (userId?: string) => {
   return Prisma.validator<Prisma.CommentFindManyArgs>()({
@@ -8,15 +11,13 @@ export const commentWithAuthorAndUserUpvote = (userId?: string) => {
       createdAt: 'desc',
     },
     include: {
-      upvotes: { where: { userId } },
+      upvotes: { take: userId ? 1 : 0, where: { userId } },
       author: { select: { username: true } },
     },
   });
 };
 
-export type PostComment = Prisma.CommentGetPayload<ReturnType<typeof commentWithAuthorAndUserUpvote>>;
-
-export async function byId(ctx: RequestlessContext, id: string) {
+export async function byId(ctx: Requestless<Context>, id: string) {
   const [comment, comments] = await ctx.prisma.$transaction(async prisma => {
     const comment = await prisma.comment.findUnique({
       where: { id },
@@ -65,3 +66,10 @@ export async function byId(ctx: RequestlessContext, id: string) {
 
   return null;
 }
+
+export const create = async (ctx: Requestless<AuthedContext>, input: z.infer<typeof createCommentSchema>) => {
+  return ctx.prisma.comment.create({
+    data: { ...input, authorId: ctx.session.user.id },
+    select: defaultCommentSelect,
+  });
+};

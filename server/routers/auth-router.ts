@@ -1,5 +1,5 @@
 import { createRouter } from 'server/create-router';
-import * as z from 'zod';
+import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { defaultUserSelect } from 'server/domains/users';
 

@@ -1,4 +1,6 @@
-import * as z from 'zod';
+import type { PostComment } from '../comments';
+import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 export const createCommentSchema = z.object({
   postId: z.string(),
@@ -9,11 +11,16 @@ export const createCommentSchema = z.object({
     .max(1024, 'Your comment is too long, please keep it under 1024 characters'),
 });
 
-import type { PostComment } from '../comments';
+export const defaultCommentSelect = Prisma.validator<Prisma.CommentSelect>()({
+  id: true,
+  content: true,
+  createdAt: true,
+});
 
 export type PostCommentWithChildren = PostComment & {
   comments: PostCommentWithChildren[];
   childCount: number;
+  upvoted: boolean;
 };
 
 const countChildren = (comments: PostCommentWithChildren[]): number => {
@@ -29,7 +36,7 @@ export function threadComments(comments: PostComment[], rootId?: string): PostCo
 
   // initialize entries
   for (const comment of comments) {
-    byId[comment.id] = { ...comment, comments: [], childCount: 0 };
+    byId[comment.id] = { ...comment, comments: [], childCount: 0, upvoted: false };
   }
 
   // nest comments under their parents

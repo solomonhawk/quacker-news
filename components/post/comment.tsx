@@ -14,7 +14,7 @@ export const Comment = ({ comment }: { comment: PostCommentWithChildren }) => {
           postId={comment.postId}
           commentId={comment.id}
           disabled={comment.authorId === 'a78b4628-c4cd-414f-8031-6d62a300ead3'}
-          upvoted={comment.upvotes.length > 0}
+          upvoted={comment.upvoted}
           visible={expanded}
         />
 

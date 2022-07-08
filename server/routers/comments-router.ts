@@ -1,14 +1,7 @@
-import { Prisma } from '@prisma/client';
 import { createProtectedRouter, createRouter } from 'server/create-router';
 import { createCommentSchema } from 'server/domains/comments/helpers';
-import * as z from 'zod';
+import { z } from 'zod';
 import * as comments from '../domains/comments';
-
-const defaultCommentSelect = Prisma.validator<Prisma.CommentSelect>()({
-  id: true,
-  content: true,
-  createdAt: true,
-});
 
 export const commentsRouter = createRouter()
   /**
@@ -21,9 +14,7 @@ export const commentsRouter = createRouter()
     meta: {
       resourceName: 'comment',
     },
-    async resolve({ input: { id }, ctx }) {
-      return comments.byId(ctx, id);
-    },
+    resolve: async ({ input: { id }, ctx }) => comments.byId(ctx, id),
   })
   .merge(
     createProtectedRouter()
@@ -35,11 +26,6 @@ export const commentsRouter = createRouter()
         meta: {
           resourceName: 'comment',
         },
-        async resolve({ input, ctx }) {
-          return ctx.prisma.comment.create({
-            data: { ...input, authorId: ctx.session.user.id },
-            select: defaultCommentSelect,
-          });
-        },
+        resolve: async ({ input, ctx }) => comments.create(ctx, input),
       }),
   );

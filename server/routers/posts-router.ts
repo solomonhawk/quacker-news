@@ -1,3 +1,4 @@
+import { PostType } from '@prisma/client';
 import { createProtectedRouter, createRouter } from 'server/create-router';
 import { paginationSchema } from 'server/domains/pagination';
 import * as posts from 'server/domains/posts';
@@ -9,13 +10,14 @@ export const postsRouter = createRouter()
    * @description Query all posts
    */
   .query('all', {
-    input: paginationSchema,
+    input: z
+      .object({ type: z.nativeEnum(PostType).optional() })
+      .merge(paginationSchema)
+      .default({}),
     meta: {
       resourceName: 'post',
     },
-    async resolve({ input: { page, perPage }, ctx }) {
-      return posts.all(ctx, page, perPage);
-    },
+    resolve: async ({ input: { page, perPage, type }, ctx }) => posts.all(ctx, page, perPage, type),
   })
 
   /**
@@ -28,10 +30,9 @@ export const postsRouter = createRouter()
     meta: {
       resourceName: 'post',
     },
-    async resolve({ input: { id }, ctx }) {
-      return posts.byId(ctx, id);
-    },
+    resolve: async ({ input: { id }, ctx }) => posts.byId(ctx, id),
   })
+
   .merge(
     createProtectedRouter()
       /**
@@ -42,8 +43,6 @@ export const postsRouter = createRouter()
         meta: {
           resourceName: 'post',
         },
-        async resolve({ input, ctx }) {
-          return ctx.prisma.post.create({ data: { ...input, authorId: ctx.session.user.id } });
-        },
+        resolve: async ({ input, ctx }) => posts.create(ctx, input),
       }),
   );

@@ -1,15 +1,25 @@
-import { RequestlessContext } from 'server/context';
+import { PostType } from '@prisma/client';
+import { Requestless, Context, AuthedContext } from 'server/context';
+import { z } from 'zod';
 import { commentWithAuthorAndUserUpvote } from '../comments';
 import { threadComments } from '../comments/helpers';
+import { createPostSchema, derivePostType } from './helpers';
 
-export async function all(ctx: RequestlessContext, page: number, perPage: number) {
+export async function all(ctx: Requestless<Context>, page: number, perPage: number, type?: PostType) {
   const skip = (page - 1) * perPage;
 
   const [totalCount, posts] = await ctx.prisma.$transaction([
-    ctx.prisma.post.count(),
+    ctx.prisma.post.count({
+      where: {
+        type,
+      },
+    }),
     ctx.prisma.post.findMany({
       skip,
       take: perPage,
+      where: {
+        type,
+      },
       include: {
         _count: true,
         upvotes: {
@@ -89,3 +99,9 @@ export async function byId(ctx: Requestless<Context>, id: string) {
     }),
   };
 }
+
+export const create = async (ctx: Requestless<AuthedContext>, input: z.infer<typeof createPostSchema>) => {
+  return ctx.prisma.post.create({
+    data: { ...input, type: derivePostType(input.title, input.url), authorId: ctx.session.user.id },
+  });
+};

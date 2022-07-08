@@ -1,4 +1,5 @@
-import * as z from 'zod';
+import { z } from 'zod';
+import { PostType } from '@prisma/client';
 
 export const createPostSchema = z
   .object({
@@ -24,3 +25,19 @@ export const createPostSchema = z
       });
     }
   });
+
+export const derivePostType = (title: string, url?: string) => {
+  if (title.startsWith('Ask QN: ')) {
+    return PostType.ASK;
+  }
+
+  if (title.startsWith('Show QN: ')) {
+    return PostType.SHOW;
+  }
+
+  if (url) {
+    return PostType.STORY;
+  }
+
+  return PostType.DISCUSSION;
+};

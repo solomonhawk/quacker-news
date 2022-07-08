@@ -64,6 +64,7 @@ model VerificationToken {
 
 model Post {
   id        String       @id @default(uuid())
+  type      PostType     @default(DISCUSSION)
   title     String?
   content   String?
   url       String?      @unique
@@ -114,4 +115,11 @@ model CommentUpvote {
 
   @@unique([commentId, userId])
   @@map("comment_upvotes")
+}
+
+enum PostType {
+  STORY
+  DISCUSSION
+  ASK
+  SHOW
 }

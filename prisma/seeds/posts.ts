@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PostType, Prisma, PrismaClient } from '@prisma/client';
 
 export const seed = async (prisma: PrismaClient) => {
   const users = await prisma.user.findMany();
@@ -13,6 +13,7 @@ export const seed = async (prisma: PrismaClient) => {
       content: null,
       createdAt: new Date(),
       url: 'https://news.ycombinator.com/item?id=31939983',
+      type: PostType.STORY,
       authorId: users[0].id,
     },
     {
@@ -20,6 +21,7 @@ export const seed = async (prisma: PrismaClient) => {
       content: 'This is my first post',
       createdAt: new Date(),
       url: null,
+      type: PostType.DISCUSSION,
       authorId: users[1].id,
     },
   ];

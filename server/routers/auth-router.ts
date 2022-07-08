@@ -1,7 +1,7 @@
 import { createRouter } from 'server/create-router';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-import { defaultUserSelect } from 'server/domains/users';
+import { defaultUserSelect } from 'server/domains/users/helpers';
 
 export const authRouter = createRouter().mutation('register', {
   input: z.object({

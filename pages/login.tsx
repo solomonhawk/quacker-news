@@ -4,33 +4,33 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useErrorHandler } from 'react-error-boundary';
 import { useMutation } from 'react-query';
+
+class InvalidCredentialsError extends Error {}
 
 export const Login: NextPage = () => {
   const router = useRouter();
   const { redirect } = router.query;
+  const handleError = useErrorHandler();
 
   const login = useMutation(
     async (credentials: { username: string; password: string }) => {
-      return await signIn('credentials', {
+      return signIn('credentials', {
         ...credentials,
         callbackUrl: (redirect as string) || '/',
         redirect: false,
       }).then(response => {
         if (response?.error) {
-          throw response.error;
+          throw new InvalidCredentialsError(response.error);
         }
 
         return response;
       });
     },
     {
-      // don't propagate 401's to the error boundary, handle them locally
-      useErrorBoundary: false,
       onSuccess: response => {
-        if (response?.url) {
-          router.push(response.url);
-        }
+        router.push(response?.url || '/');
       },
     },
   );
@@ -40,10 +40,16 @@ export const Login: NextPage = () => {
 
     const formData = new FormData(e.currentTarget);
 
-    return login.mutateAsync({
-      username: formData.get('username') as string,
-      password: formData.get('password') as string,
-    });
+    return login
+      .mutateAsync({
+        username: formData.get('username') as string,
+        password: formData.get('password') as string,
+      })
+      .catch(e => {
+        if (!(e instanceof InvalidCredentialsError)) {
+          handleError(e);
+        }
+      });
   };
 
   return (

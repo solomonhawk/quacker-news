@@ -4,9 +4,11 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useErrorHandler } from 'react-error-boundary';
 
 export const Register = () => {
   const router = useRouter();
+  const handleError = useErrorHandler();
 
   const registerUser = trpc.useMutation('user.create', {
     onSuccess: async (_data, { username, password }) => {
@@ -21,14 +23,20 @@ export const Register = () => {
     const formData = new FormData(e.currentTarget);
 
     if (formData.get('password') !== formData.get('password_confirmation')) {
-      throw new Error('passwords must match');
+      return alert('passwords must match');
     }
 
-    return registerUser.mutateAsync({
-      email: formData.get('email') as string,
-      username: formData.get('username') as string,
-      password: formData.get('password') as string,
-    });
+    return registerUser
+      .mutateAsync({
+        email: formData.get('email') as string,
+        username: formData.get('username') as string,
+        password: formData.get('password') as string,
+      })
+      .catch(e => {
+        if (e.data.code !== 'CONFLICT') {
+          handleError(e);
+        }
+      });
   };
 
   return (
@@ -41,6 +49,8 @@ export const Register = () => {
 
       <div className="bg-[#f6f6ef] p-4">
         <h1 className="text-xl font-semibold mb-4">Create Account</h1>
+
+        {registerUser.error ? <span className="block text-red-500 mb-2">{registerUser.error.message}</span> : null}
 
         <form className="mb-4" onSubmit={handleSubmit}>
           <div className="mb-2">

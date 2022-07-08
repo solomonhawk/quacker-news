@@ -10,7 +10,7 @@ import Head from 'next/head';
 import { NextPageWithLayout } from './_app';
 
 const ReplyPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ id }) => {
-  const commentQuery = trpc.useQuery(['comment.byId', { id }], { useErrorBoundary: false });
+  const commentQuery = trpc.useQuery(['comment.byId', { id }]);
 
   return (
     <>
@@ -45,9 +45,7 @@ const ReplyPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServer
   );
 };
 
-export const getServerSideProps: GetServerSideProps<
-  ServerSideDataProps<{ id: string; notFound?: boolean }>
-> = async ctx => {
+export const getServerSideProps: GetServerSideProps<ServerSideDataProps<{ id: string }>> = async ctx => {
   const id = ctx.query.id as string;
   return dehydrateQueries(ctx, async ssg => await ssg.fetchQuery('comment.byId', { id }), { id });
 };

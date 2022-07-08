@@ -2,12 +2,14 @@ import { ProtectedLink } from 'components/protected-link';
 import { trpc } from 'lib/trpc';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { useErrorHandler } from 'react-error-boundary';
 import { createPostSchema } from 'server/domains/posts/helpers';
 
 export const AddPostForm = () => {
   const router = useRouter();
   const { data: session } = useSession();
+  const handleError = useErrorHandler();
   const formRef = useRef<HTMLFormElement | null>(null);
   const [errors, setErrors] = useState<{
     title?: string[] | undefined;
@@ -37,8 +39,8 @@ export const AddPostForm = () => {
 
     if (validation.success) {
       return addPost.mutateAsync(validation.data).catch(e => {
-        if (e.code !== 'CONFLICT') {
-          throw e;
+        if (e.data.code !== 'CONFLICT') {
+          handleError(e);
         }
       });
     }

@@ -1,7 +1,6 @@
-import { TRPCError } from '@trpc/server';
 import bcrypt from 'bcryptjs';
-import * as users from 'server/domains/users';
 import { createProtectedRouter, createRouter } from 'server/create-router';
+import * as users from 'server/domains/users';
 import { defaultUserSelect } from 'server/domains/users';
 import { z } from 'zod';
 
@@ -17,19 +16,10 @@ export const usersRouter = createRouter()
       resourceName: 'user',
     },
     async resolve({ input: { id }, ctx }) {
-      const user = ctx.prisma.user.findUnique({
+      return ctx.prisma.user.findUniqueOrThrow({
         where: { id },
         select: defaultUserSelect,
       });
-
-      if (!user) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: `No user with id '${id}'`,
-        });
-      }
-
-      return user;
     },
   })
 

@@ -1,15 +1,22 @@
-import { PostUpvoteButton } from 'components/post-upvote-button';
+import { CommentUpvoteButton } from 'components/comment-upvote-button';
 import { ArrayElement } from 'helpers/trpc';
 import Link from 'next/link';
 import type { Comments } from '.';
 import { Timestamp } from '../timestamp';
 
+// @TW: bg-yellow-200 not-italic
 export const CommentRow = ({ comment }: { comment: ArrayElement<Comments> }) => {
   return (
     <>
       <span className="opacity-60 font-mono mr-1">{comment.position}.</span>
 
-      <PostUpvoteButton postId={comment.id} disabled={false} upvoted={comment.upvoted} />
+      <CommentUpvoteButton
+        postId={comment.postId}
+        commentId={comment.id}
+        disabled={false}
+        upvoted={comment.upvoted}
+        visible
+      />
 
       <div className="flex flex-col ml-2">
         <div className="flex items-center">

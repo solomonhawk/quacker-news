@@ -57,7 +57,7 @@ export const Post = ({ post }: { post: PostQueryById }) => {
         </div>
       </div>
 
-      {post.content && <pre className="mb-8 ml-7 font-sans">{post.content}</pre>}
+      {post.content && <pre className="mb-8 ml-5 font-sans">{post.content}</pre>}
 
       <div className="mb-8 ml-5">
         <AddCommentForm postId={post.id} submitButtonText="add comment" />

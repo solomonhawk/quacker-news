@@ -6,6 +6,7 @@ import { commentUpvotesRouter } from './routers/comment-upvotes-router';
 import { commentsRouter } from './routers/comments-router';
 import { postUpvotesRouter } from './routers/post-upvotes-router';
 import { postsRouter } from './routers/posts-router';
+import { searchRouter } from './routers/search-router';
 import { usersRouter } from './routers/users-router';
 
 export const appRouter = createRouter()
@@ -13,6 +14,7 @@ export const appRouter = createRouter()
   .middleware(loggingMiddleware)
   .middleware(errorsMiddleware)
   .merge('user.', usersRouter)
+  .merge('search.', searchRouter)
   .merge('post.', postsRouter)
   .merge('post.upvote.', postUpvotesRouter)
   .merge('comment.', commentsRouter)

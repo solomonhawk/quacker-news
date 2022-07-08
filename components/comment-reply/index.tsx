@@ -1,6 +1,6 @@
 import { AddCommentForm } from 'components/add-comment-form';
 import { CommentUpvoteButton } from 'components/comment-upvote-button';
-import { Timestamp } from 'components/posts-list/timestamp';
+import { Timestamp } from 'components/timestamp';
 import { InferQueryOutput } from 'helpers/trpc';
 import Link from 'next/link';
 

@@ -1,7 +1,8 @@
 import { Prisma } from '@prisma/client';
 import { AuthedContext, Context, Requestless } from 'server/context';
 import { z } from 'zod';
-import { selectOneForCurrentUser } from '../helpers/filters';
+import { selectOneForCurrentUser } from 'server/domains/helpers/filters';
+import { highlightSearchTerm, OrderType } from 'server/domains/search/helpers';
 import { createCommentSchema, defaultCommentSelect, threadComments } from './helpers';
 
 export type PostComment = Prisma.CommentGetPayload<ReturnType<typeof commentWithAuthorAndUserUpvote>>;
@@ -65,6 +66,58 @@ export async function byId(ctx: Requestless<Context>, id: string) {
   }
 
   return null;
+}
+
+export async function search(
+  ctx: Requestless<Context>,
+  page: number,
+  perPage: number,
+  order: OrderType,
+  query?: string,
+) {
+  const skip = (page - 1) * perPage;
+
+  const where: Prisma.CommentWhereInput | undefined = query
+    ? { content: { contains: query, mode: 'insensitive' } }
+    : undefined;
+
+  const orderBy =
+    order === OrderType.DATE ? { createdAt: Prisma.SortOrder.desc } : { upvotes: { _count: Prisma.SortOrder.desc } };
+
+  const [totalCount, comments] = await ctx.prisma.$transaction([
+    ctx.prisma.comment.count({ where }),
+    ctx.prisma.comment.findMany({
+      skip: skip,
+      take: perPage,
+      where,
+      orderBy,
+      include: {
+        _count: true,
+        author: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        upvotes: selectOneForCurrentUser(ctx.session?.user?.id),
+      },
+    }),
+  ]);
+
+  return {
+    page,
+    perPage,
+    totalCount,
+    totalPages: Math.ceil(totalCount / perPage),
+    comments: comments.map((comment, i) => {
+      return {
+        ...comment,
+        content: highlightSearchTerm(comment.content, query),
+        upvoted: ctx.session?.user?.id ? comment.upvotes.length > 0 : false,
+        position: skip + i + 1,
+      };
+    }),
+  };
 }
 
 export const create = async (ctx: Requestless<AuthedContext>, input: z.infer<typeof createCommentSchema>) => {

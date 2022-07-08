@@ -1,7 +1,7 @@
 import { PostFavoriteButton } from 'components/post-favorite-button';
 import { PostHideButton } from 'components/post-hide-button';
 import { PostUpvoteButton } from 'components/post-upvote-button';
-import { Timestamp } from 'components/posts-list/timestamp';
+import { Timestamp } from 'components/timestamp';
 import { InferQueryOutput } from 'helpers/trpc';
 import { host } from 'helpers/url';
 import Link from 'next/link';

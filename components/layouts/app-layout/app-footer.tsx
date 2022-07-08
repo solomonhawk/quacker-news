@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 const links = [
   { text: 'Guidelines', href: '/guidelines' },
@@ -12,10 +13,18 @@ const links = [
 ];
 
 const SearchForm = () => {
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    router.push(`/search?q=${formData.get('q')}`);
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <label htmlFor="query">Search: </label>
-      <input id="query" type="text" name="query" className="border border-gray-500 rounded-sm text-sm p-[2px]" />
+      <input id="query" type="text" name="q" className="border border-gray-500 rounded-sm text-sm p-[2px]" required />
     </form>
   );
 };

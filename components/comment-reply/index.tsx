@@ -11,7 +11,7 @@ type Props = {
 
 export const CommentReply = ({ comment }: Props) => {
   return (
-    <div className="bg-[#f6f6ef] p-2">
+    <div className="p-2">
       <div className="flex flex-col ml-2 mb-4">
         <div className="flex items-start mb-2 text-sm">
           <CommentUpvoteButton

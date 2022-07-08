@@ -60,7 +60,7 @@ export const Login: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="bg-[#f6f6ef] p-4">
+      <div className="p-4">
         <h1 className="text-xl font-semibold mb-4">Log In</h1>
 
         {login.status === 'error' && (

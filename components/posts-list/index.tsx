@@ -11,7 +11,7 @@ type Props = {
 
 export const PostsList = ({ posts, nextPageUrl }: Props) => {
   return (
-    <div className="bg-[#f6f6ef] pb-2">
+    <div className="pb-2">
       <ol className="py-1">
         {posts.map(post => {
           return (

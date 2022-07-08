@@ -1,3 +1,4 @@
+import { PostHideButton } from 'components/post-hide-button';
 import { PostUpvoteButton } from 'components/post-upvote-button';
 import { ArrayElement, InferQueryOutput } from 'helpers/trpc';
 import { host } from 'helpers/url';
@@ -28,10 +29,10 @@ export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.al
 
         <div className="text-xs opacity-60">
           {post._count.upvotes} point{post._count.upvotes === 1 ? '' : 's'} by{' '}
-          <Link href={`/user?id=${post.author.id}`}>
+          <Link href={`/user?id=${post.author.username}`}>
             <a className="hover:underline">{post.author.username}</a>
           </Link>{' '}
-          <Timestamp date={post.createdAt} /> | <button className="hover:underline">hide</button> |{' '}
+          <Timestamp date={post.createdAt} /> | <PostHideButton postId={post.id} hidden={post.hidden} /> |{' '}
           <Link href={`/item?id=${post.id}`}>
             <a className="hover:underline">
               {post._count.comments === 0

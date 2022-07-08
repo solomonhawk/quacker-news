@@ -1,3 +1,4 @@
+import { PostHideButton } from 'components/post-hide-button';
 import { PostUpvoteButton } from 'components/post-upvote-button';
 import { Timestamp } from 'components/posts-list/timestamp';
 import { InferQueryOutput } from 'helpers/trpc';
@@ -10,7 +11,7 @@ type PostQueryById = NonNullable<InferQueryOutput<'post.byId'>>;
 
 export const Post = ({ post }: { post: PostQueryById }) => {
   return (
-    <div className="bg-[#f6f6ef] p-2">
+    <div className="p-2">
       <div className="flex items-start mb-4">
         <PostUpvoteButton postId={post.id} disabled={false} upvoted={post.upvoted} />
 
@@ -38,7 +39,10 @@ export const Post = ({ post }: { post: PostQueryById }) => {
             <Link href={`/user?id=${post.author.id}`}>
               <a className="hover:underline">{post.author.username}</a>
             </Link>{' '}
-            <Timestamp date={post.createdAt} /> | <button className="hover:underline">hide</button> |{' '}
+            <Timestamp date={post.createdAt} />
+            {' | '}
+            <PostHideButton postId={post.id} hidden={post.hidden} />
+            {' | '}
             <Link href={`/item?id=${post.id}`}>
               <a className="hover:underline">
                 {post._count.comments === 0

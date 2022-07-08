@@ -47,7 +47,7 @@ export const Register = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="bg-[#f6f6ef] p-4">
+      <div className="p-4">
         <h1 className="text-xl font-semibold mb-4">Create Account</h1>
 
         {registerUser.error ? <span className="block text-red-500 mb-2">{registerUser.error.message}</span> : null}

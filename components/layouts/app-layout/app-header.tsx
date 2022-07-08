@@ -54,7 +54,7 @@ export const AppHeader = () => {
 
       {session && (
         <div className="ml-auto flex-shrink-0">
-          <Link href={`/user?id=${session.user?.id}`}>
+          <Link href={`/user?id=${session.user?.username}`}>
             <a className="px-1 ml-auto">{session.user?.username}</a>
           </Link>
 

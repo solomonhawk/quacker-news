@@ -36,6 +36,17 @@ export const postsRouter = createRouter()
   .merge(
     createProtectedRouter()
       /**
+       * @description Query all posts
+       */
+      .query('hidden', {
+        input: paginationSchema.default({}),
+        meta: {
+          resourceName: 'post',
+        },
+        resolve: async ({ input: { page, perPage }, ctx }) => posts.hidden(ctx, page, perPage),
+      })
+
+      /**
        * @description Create a new post
        */
       .mutation('create', {
@@ -44,5 +55,31 @@ export const postsRouter = createRouter()
           resourceName: 'post',
         },
         resolve: async ({ input, ctx }) => posts.create(ctx, input),
+      })
+
+      /**
+       * @description Hide a post
+       */
+      .mutation('hide', {
+        input: z.object({
+          id: z.string(),
+        }),
+        meta: {
+          resourceName: 'post',
+        },
+        resolve: async ({ input: { id }, ctx }) => posts.hide(ctx, id),
+      })
+
+      /**
+       * @description Unhide a post
+       */
+      .mutation('unhide', {
+        input: z.object({
+          id: z.string(),
+        }),
+        meta: {
+          resourceName: 'post',
+        },
+        resolve: async ({ input: { id }, ctx }) => posts.unhide(ctx, id),
       }),
   );

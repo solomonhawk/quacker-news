@@ -55,7 +55,7 @@ export const AddPostForm = () => {
   };
 
   return (
-    <div className="bg-[#f6f6ef] p-4">
+    <div className="p-4">
       {addPost.error ? <span className="block text-red-500 mb-2">{addPost.error.message}</span> : null}
 
       <form ref={formRef} onSubmit={handleSubmit}>

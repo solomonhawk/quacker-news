@@ -6,7 +6,7 @@ export const ReplyLayout = ({ children }: { children: React.ReactNode }) => {
     <main className="sm:p-2">
       <div className="sm:container mx-auto sm:px-4">
         <ReplyHeader />
-        {children}
+        <div className="bg-[#f6f6ef]">{children}</div>
       </div>
     </main>
   );

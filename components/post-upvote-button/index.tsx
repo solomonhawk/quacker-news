@@ -31,7 +31,7 @@ export const PostUpvoteButton = ({
     <button
       onClick={upvote}
       disabled={disabled || toggleUpvotePost.isLoading}
-      className={cx('ml-2', {
+      className={cx({
         'opacity-40': !upvoted,
         'text-orange-500': upvoted,
       })}

@@ -22,11 +22,6 @@ export async function byId(ctx: Requestless<Context>, id: string) {
     const comment = await prisma.comment.findUnique({
       where: { id },
       include: {
-        author: {
-          select: {
-            username: true,
-          },
-        },
         post: {
           include: {
             author: {
@@ -36,11 +31,7 @@ export async function byId(ctx: Requestless<Context>, id: string) {
             },
           },
         },
-        upvotes: {
-          where: {
-            userId: ctx.session?.user?.id,
-          },
-        },
+        ...commentWithAuthorAndUserUpvote(ctx.session?.user?.id).include,
       },
     });
 
@@ -60,7 +51,15 @@ export async function byId(ctx: Requestless<Context>, id: string) {
   if (comment) {
     return {
       ...comment,
-      comments: threadComments(comments, comment.id),
+      comments: threadComments(
+        comments.map(comment => {
+          return {
+            ...comment,
+            upvoted: ctx.session?.user?.id ? comment.upvotes.length > 0 : false,
+          };
+        }),
+        comment.id,
+      ),
     };
   }
 

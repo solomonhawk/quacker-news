@@ -12,7 +12,7 @@ type PostQueryById = NonNullable<InferQueryOutput<'post.byId'>>;
 
 export const Post = ({ post }: { post: PostQueryById }) => {
   return (
-    <div className="p-2">
+    <div className="p-4">
       <div className="flex items-start mb-4">
         <PostUpvoteButton postId={post.id} disabled={false} upvoted={post.upvoted} />
 
@@ -59,7 +59,7 @@ export const Post = ({ post }: { post: PostQueryById }) => {
 
       {post.content && <pre className="mb-8 ml-7 font-sans">{post.content}</pre>}
 
-      <div className="mb-8 ml-7">
+      <div className="mb-8 ml-5">
         <AddCommentForm postId={post.id} submitButtonText="add comment" />
       </div>
 

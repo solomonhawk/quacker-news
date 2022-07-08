@@ -159,16 +159,14 @@ export async function byId(ctx: Requestless<Context>, id: string) {
     favorited: ctx.session?.user?.id ? post.favorites.length > 0 : false,
     hidden: ctx.session?.user?.id ? post.hiddenPosts.length > 0 : false,
     upvoted: ctx.session?.user?.id ? post.upvotes.length > 0 : false,
-    comments: threadComments(post.comments).map(comment => {
-      if (ctx.session?.user?.id) {
+    comments: threadComments(
+      post.comments.map(comment => {
         return {
           ...comment,
-          upvoted: comment.upvotes.length > 0,
+          upvoted: ctx.session?.user?.id ? comment.upvotes.length > 0 : false,
         };
-      }
-
-      return comment;
-    }),
+      }),
+    ),
   };
 }
 

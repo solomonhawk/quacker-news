@@ -8,8 +8,8 @@ export const Comment = ({ comment }: { comment: PostCommentWithChildren }) => {
   const [expanded, setExpanded] = useLocalStorageState(['comment', comment.id, 'expanded'], true);
 
   return (
-    <details id={comment.id} open={expanded} className="py-2">
-      <summary className="flex cursor-pointer list-none items-center">
+    <div id={comment.id} className="py-2">
+      <div className="flex items-center">
         <CommentUpvoteButton
           postId={comment.postId}
           commentId={comment.id}
@@ -19,15 +19,22 @@ export const Comment = ({ comment }: { comment: PostCommentWithChildren }) => {
         />
 
         <span className="ml-2 text-sm opacity-60">
-          {comment.author.username} <Timestamp date={comment.createdAt} />{' '}
+          <Link href={`/user?id=${comment.author.username}`}>
+            <a className="hover:underline">{comment.author.username}</a>
+          </Link>{' '}
+          <Link href={`/comment?id=${comment.id}`}>
+            <a className="hover:underline">
+              <Timestamp date={comment.createdAt} />
+            </a>
+          </Link>{' '}
           <button className="hover:underline" onClick={() => setExpanded(!expanded)}>
             {expanded ? '[-]' : `[${comment.childCount} more]`}
           </button>
         </span>
-      </summary>
+      </div>
 
       {expanded ? (
-        <div className="ml-7">
+        <div className="ml-5">
           <p>{comment.content}</p>
 
           <Link
@@ -37,14 +44,14 @@ export const Comment = ({ comment }: { comment: PostCommentWithChildren }) => {
           >
             <a className="text-xs underline">reply</a>
           </Link>
+
+          <div className="ml-5">
+            {comment.comments.map(reply => {
+              return <Comment key={reply.id} comment={reply} />;
+            })}
+          </div>
         </div>
       ) : null}
-
-      <div className="ml-5">
-        {comment.comments.map(reply => {
-          return <Comment key={reply.id} comment={reply} />;
-        })}
-      </div>
-    </details>
+    </div>
   );
 };

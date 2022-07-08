@@ -36,9 +36,11 @@ const CommentPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
 
               <CommentReply comment={data} />
 
-              {data.comments.map(comment => {
-                return <Comment key={comment.id} comment={comment} />;
-              })}
+              <div className="ml-4 pb-4">
+                {data.comments.map(comment => {
+                  return <Comment key={comment.id} comment={comment} />;
+                })}
+              </div>
             </>
           );
         }}

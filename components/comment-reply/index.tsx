@@ -1,6 +1,5 @@
-import { CommentUpvoteButton } from 'components/comment-upvote-button';
 import { AddCommentForm } from 'components/add-comment-form';
-import { Comment } from 'components/post/comment';
+import { CommentUpvoteButton } from 'components/comment-upvote-button';
 import { Timestamp } from 'components/posts-list/timestamp';
 import { InferQueryOutput } from 'helpers/trpc';
 import Link from 'next/link';
@@ -11,9 +10,9 @@ type Props = {
 
 export const CommentReply = ({ comment }: Props) => {
   return (
-    <div className="p-2">
-      <div className="flex flex-col ml-2 mb-4">
-        <div className="flex items-start mb-2 text-sm">
+    <div className="p-4">
+      <div className="flex flex-col ml-1 mb-4">
+        <div className="flex items-center mb-2">
           <CommentUpvoteButton
             postId={comment.postId}
             commentId={comment.id}
@@ -22,7 +21,7 @@ export const CommentReply = ({ comment }: Props) => {
             visible
           />
 
-          <div className="ml-2 flex items-center gap-1 opacity-60">
+          <div className="ml-2 flex items-center gap-1 opacity-60 text-sm flex-wrap">
             <Link href={`/user?id=${comment.authorId}`}>
               <a className="hover:underline">{comment.author.username}</a>
             </Link>
@@ -49,18 +48,14 @@ export const CommentReply = ({ comment }: Props) => {
           </div>
         </div>
 
-        <div className="ml-7">
+        <div className="ml-4">
           <p>{comment.content}</p>
         </div>
       </div>
 
-      <div className="mb-8 ml-7">
+      <div className="mb-8 ml-5">
         <AddCommentForm postId={comment.postId} parentId={comment.id} submitButtonText="reply" />
       </div>
-
-      {comment.comments.map(reply => {
-        return <Comment key={reply.id} comment={reply} />;
-      })}
     </div>
   );
 };

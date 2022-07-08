@@ -9,7 +9,7 @@ import { Timestamp } from './timestamp';
 export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.all'>['posts']> }) => {
   return (
     <>
-      <span className="opacity-60 font-mono">{post.position}.</span>
+      <span className="opacity-60 font-mono mr-1">{post.position}.</span>
 
       <PostUpvoteButton postId={post.id} disabled={false} upvoted={post.upvoted} />
 

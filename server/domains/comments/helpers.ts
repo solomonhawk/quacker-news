@@ -27,7 +27,10 @@ const countChildren = (comments: PostCommentWithChildren[]): number => {
   return comments.length + comments.reduce((acc, comment) => acc + countChildren(comment.comments), 0);
 };
 
-export function threadComments(comments: PostComment[], rootId?: string): PostCommentWithChildren[] {
+export function threadComments(
+  comments: (PostComment & { upvoted: boolean })[],
+  rootId?: string,
+): PostCommentWithChildren[] {
   const byId: Record<string, PostCommentWithChildren> = {};
 
   // @TODO(shawk) @PERF: it would be nice not to have to iterate this list
@@ -36,7 +39,7 @@ export function threadComments(comments: PostComment[], rootId?: string): PostCo
 
   // initialize entries
   for (const comment of comments) {
-    byId[comment.id] = { ...comment, comments: [], childCount: 0, upvoted: false };
+    byId[comment.id] = { ...comment, comments: [], childCount: 0, upvoted: comment.upvoted };
   }
 
   // nest comments under their parents

@@ -12,10 +12,10 @@ type Props = {
 export const PostsList = ({ posts, nextPageUrl }: Props) => {
   return (
     <div className="pb-2">
-      <ol className="py-1">
+      <ol className="py-2">
         {posts.map(post => {
           return (
-            <li key={post.id} className="flex items-start px-2 py-1">
+            <li key={post.id} className="flex items-start px-3 py-1">
               <PostRow post={post} />
             </li>
           );

@@ -1,3 +1,4 @@
+import ActiveLink from 'components/active-link';
 import { signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -6,7 +7,7 @@ import { UserKarma } from './user-karma';
 const links = [
   { text: 'welcome', href: '/welcome', requireAuth: true },
   { text: 'new', href: '/newest' },
-  { text: 'threads', href: '/threads', requireAuth: true },
+  { text: 'threads', href: (username: string) => `/threads?id=${username}`, requireAuth: true },
   { text: 'past', href: '/front' },
   { text: 'comments', href: '/newcomments' },
   { text: 'ask', href: '/ask' },
@@ -37,10 +38,12 @@ export const AppHeader = () => {
           {links
             .filter(link => (session ? true : !link.requireAuth))
             .map(link => {
+              const href = typeof link.href === 'string' ? link.href : link.href(session?.user?.username || '');
+
               return (
-                <Link key={link.href} href={link.href}>
+                <ActiveLink key={href} href={href} activeClassName="text-white">
                   <a className="px-1 leading-none">{link.text}</a>
-                </Link>
+                </ActiveLink>
               );
             })}
         </nav>
@@ -54,9 +57,9 @@ export const AppHeader = () => {
 
       {session && (
         <div className="ml-auto flex-shrink-0">
-          <Link href={`/user?id=${session.user?.username}`}>
+          <ActiveLink href={`/user?id=${session.user?.username}`} activeClassName="text-white">
             <a className="px-1 ml-auto">{session.user?.username}</a>
-          </Link>
+          </ActiveLink>
 
           <UserKarma />
 

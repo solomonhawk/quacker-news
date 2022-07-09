@@ -4,5 +4,8 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
     "plugin:import/recommended"
+  ],
+  "ignorePatterns": [
+    "next.config.js"
   ]
 }

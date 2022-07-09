@@ -6,6 +6,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    runtime: 'experimental-edge',
+  },
   async rewrites() {
     return [
       {

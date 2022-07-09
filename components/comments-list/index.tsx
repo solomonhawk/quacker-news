@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { SearchQueryResult, SearchType } from 'server/domains/search/helpers';
 import { CommentRow } from './comment-row';
 
-export type Comments = (SearchQueryResult & { type: SearchType.COMMENT })['results']['comments'];
+export type Comments = (SearchQueryResult & { type: SearchType.COMMENT })['results']['records'];
 
 type Props = {
   comments: Comments;

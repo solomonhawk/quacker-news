@@ -57,7 +57,7 @@ const queryPaginatedPosts = async ({
     perPage,
     totalCount,
     totalPages: Math.ceil(totalCount / perPage),
-    posts: posts.map((post, i) => {
+    records: posts.map((post, i) => {
       return {
         ...post,
         title: highlightSearchTerm(post.title, query),

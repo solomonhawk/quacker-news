@@ -23,7 +23,7 @@ const FavoritesPage: NextPage<InferGetServerSidePropsType<typeof getServerSidePr
         success={({ data }) => {
           return (
             <PostsList
-              posts={data.posts}
+              posts={data.records}
               nextPageUrl={page * data.perPage < data.totalCount ? `/hidden?p=${page + 1}` : undefined}
             />
           );

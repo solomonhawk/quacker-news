@@ -6,7 +6,7 @@ import { host } from 'helpers/url';
 import Link from 'next/link';
 import { Timestamp } from '../timestamp';
 
-export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.all'>['posts']> }) => {
+export const PostRow = ({ post }: { post: ArrayElement<InferQueryOutput<'post.all'>['records']> }) => {
   return (
     <>
       <span className="opacity-60 font-mono mr-1">{post.position}.</span>

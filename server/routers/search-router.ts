@@ -1,27 +1,19 @@
 import { createRouter } from 'server/create-router';
 import * as comments from 'server/domains/comments';
-import { paginationSchema } from 'server/domains/pagination';
 import * as posts from 'server/domains/posts';
-import { OrderType, SearchQueryResult, SearchType } from 'server/domains/search/helpers';
-import { z } from 'zod';
+import { SearchQueryResult, searchQuerySchema, SearchType } from 'server/domains/search/helpers';
 
 export const searchRouter = createRouter()
   /**
-   * @description Query all posts and/or comments
+   * @description Query posts or comments
    */
   .query('query', {
-    input: z
-      .object({
-        query: z.string().optional(),
-        order: z.nativeEnum(OrderType).default(OrderType.DATE),
-        type: z.nativeEnum(SearchType).default(SearchType.POST),
-      })
-      .merge(paginationSchema),
+    input: searchQuerySchema,
     async resolve({ input: { page, perPage, query, order, type }, ctx }): Promise<SearchQueryResult> {
       switch (type) {
         case SearchType.POST: {
           return {
-            type: SearchType.POST,
+            type,
             query,
             order,
             results: await posts.search(ctx, page, perPage, order, query),
@@ -30,7 +22,7 @@ export const searchRouter = createRouter()
 
         case SearchType.COMMENT: {
           return {
-            type: SearchType.COMMENT,
+            type,
             query,
             order,
             results: await comments.search(ctx, page, perPage, order, query),

@@ -99,6 +99,11 @@ export async function search(
             username: true,
           },
         },
+        post: {
+          select: {
+            title: true,
+          },
+        },
         upvotes: selectOneForCurrentUser(ctx.session?.user?.id),
       },
     }),
@@ -109,7 +114,7 @@ export async function search(
     perPage,
     totalCount,
     totalPages: Math.ceil(totalCount / perPage),
-    comments: comments.map((comment, i) => {
+    records: comments.map((comment, i) => {
       return {
         ...comment,
         content: highlightSearchTerm(comment.content, query),

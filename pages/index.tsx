@@ -23,7 +23,7 @@ const IndexPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>
         success={({ data }) => {
           return (
             <PostsList
-              posts={data.posts}
+              posts={data.records}
               nextPageUrl={page * data.perPage < data.totalCount ? `/news?p=${page + 1}` : undefined}
             />
           );

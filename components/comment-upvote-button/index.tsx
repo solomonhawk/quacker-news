@@ -35,7 +35,7 @@ export const CommentUpvoteButton = ({
     <button
       onClick={upvote}
       disabled={disabled || toggleUpvoteComment.isLoading}
-      className={cx({
+      className={cx('leading-none', {
         invisible: !visible,
         'opacity-40': !upvoted,
         'text-orange-500': upvoted,

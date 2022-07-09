@@ -1,19 +1,18 @@
 import { CommentsList } from 'components/comments-list';
 import { DefaultQueryCell } from 'components/default-query-cell';
 import { PostsList } from 'components/posts-list';
+import { PostRowSimple } from 'components/posts-list/post-row-simple';
 import { SearchPageForm } from 'components/search-page-form';
 import { trpc } from 'lib/trpc';
 import { dehydrateQueries } from 'lib/trpc/dehydrate-queries';
 import type { GetServerSideProps, InferGetServerSidePropsType, NextPage } from 'next';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { SearchType, OrderType, searchQuerySchema } from 'server/domains/search/helpers';
 import qs from 'query-string';
-import { PostRowSimple } from 'components/posts-list/post-row-simple';
+import { OrderType, searchQuerySchema, SearchType } from 'server/domains/search/helpers';
 
-const SearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ page, type, query, order }) => {
-  const router = useRouter();
-  const searchQuery = trpc.useQuery(['search.query', { page, type, query, order }]);
+const SearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ params }) => {
+  const { page, query, type, order } = params;
+  const searchQuery = trpc.useQuery(['search.query', params]);
 
   return (
     <>
@@ -23,25 +22,20 @@ const SearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <DefaultQueryCell
-        query={searchQuery}
-        isEmpty={({ data }) => data.results.records.length === 0}
-        empty={({ data }) => {
-          const { type, query, order } = data;
-
-          return (
-            <SearchPageForm searchTerm={query} type={type} order={order}>
-              <div className="p-4 ">No results found</div>
-            </SearchPageForm>
-          );
-        }}
-        success={({ data }) => {
-          const { type, query, order } = data;
-
-          const children = (function () {
+      <SearchPageForm searchTerm={query} type={type} order={order}>
+        <DefaultQueryCell
+          query={searchQuery}
+          loading={() => (
+            <div className="p-4">
+              <em>Loading...</em>
+            </div>
+          )}
+          isEmpty={({ data }) => data.results.totalCount === 0}
+          empty={() => <div className="p-4">No results found</div>}
+          success={({ data }) => {
             const nextPageUrl =
               data.results.page * data.results.perPage < data.results.totalCount
-                ? `/search?${qs.stringify({ ...router.query, type, query, order, page: page + 1 })}`
+                ? `/search?${qs.stringify({ ...params, page: page + 1 })}`
                 : undefined;
 
             switch (data.type) {
@@ -55,24 +49,21 @@ const SearchPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps
                 return <CommentsList comments={data.results.records} nextPageUrl={nextPageUrl} />;
               }
             }
-          })();
-
-          return (
-            <SearchPageForm searchTerm={query} type={type} order={order}>
-              {children}
-            </SearchPageForm>
-          );
-        }}
-      />
+          }}
+        />
+      </SearchPageForm>
     </>
   );
 };
 
 export const getServerSideProps: GetServerSideProps<{
-  page: number;
-  query?: string;
-  type?: SearchType;
-  order?: OrderType;
+  params: {
+    page: number;
+    perPage: number;
+    query?: string;
+    type?: SearchType;
+    order?: OrderType;
+  };
 }> = async ctx => {
   const params = searchQuerySchema.parse({
     page: ctx.query.page,
@@ -81,7 +72,7 @@ export const getServerSideProps: GetServerSideProps<{
     order: ctx.query.order,
   });
 
-  return dehydrateQueries(ctx, async ssg => await ssg.fetchQuery('search.query', params), params);
+  return dehydrateQueries(ctx, async ssg => await ssg.fetchQuery('search.query', params), { params });
 };
 
 export default SearchPage;
